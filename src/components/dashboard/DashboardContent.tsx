@@ -192,7 +192,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 					</button>
 				</div>
 
-				<div className="flex flex-col gap-x-10">
+				<div className="h-[85vh] flex flex-col gap-x-10">
 					{/* Table Header */}
 					<div className="flex justify-between text-xs font-semibold bg-muted/40 border-b border-gray-300 dark:border-gray-700 px-6 py-2 text-muted-foreground">
 						<div className="w-1/2 text-left">Category</div>
@@ -201,126 +201,128 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 						<div className="w-1/6 text-right">Remaining</div>
 					</div>
 
-					{/* Categories */}
-					{categories?.map((cat) => {
-						const isOpen = openCategories.includes(cat.name);
-						const isPopupOpen = openPopup === cat.name;
+					<div className="h-full overflow-auto">
+						{/* Categories */}
+						{categories?.map((cat) => {
+							const isOpen = openCategories.includes(cat.name);
+							const isPopupOpen = openPopup === cat.name;
 
-						return (
-							<div key={cat.name}>
-								{/* Category Header */}
-								<div className="relative">
-									<div className="flex items-center justify-between px-6 py-3 bg-background hover:bg-secondary border-b border-gray-300 dark:border-gray-700">
-										<div className="w-1/2 flex items-center gap-x-3 font-bold relative">
-											<button
-												onClick={() => {
-													if(isOpen) {
-														setOpenCategories(
-															openCategories.filter((c) => c !== cat.name)
-														);
-													} else {
-														setOpenCategories([...openCategories, cat.name]);
-													}
-												}}
-											>
-												{isOpen ? (
-													<ChevronDown
-														size={15}
-														className="text-muted-foreground"
-													/>
-												) : (
-													<ChevronRight
-														size={15}
-														className="text-muted-foreground"
-													/>
-												)}
-											</button>
-											<div>{cat.name}</div>
-											<button
-												onClick={() => {
-													setOpenPopup(isPopupOpen ? null : cat.name);
-													setNewItemName("");
-												}}
-											>
-												<CirclePlus size={18} className="text-blue-600" />
-											</button>
+							return (
+								<div key={cat.name}>
+									{/* Category Header */}
+									<div className="relative">
+										<div className="flex items-center justify-between px-6 py-3 bg-background hover:bg-secondary border-b border-gray-300 dark:border-gray-700">
+											<div className="w-1/2 flex items-center gap-x-3 font-bold relative">
+												<button
+													onClick={() => {
+														if(isOpen) {
+															setOpenCategories(
+																openCategories.filter((c) => c !== cat.name)
+															);
+														} else {
+															setOpenCategories([...openCategories, cat.name]);
+														}
+													}}
+												>
+													{isOpen ? (
+														<ChevronDown
+															size={15}
+															className="text-muted-foreground"
+														/>
+													) : (
+														<ChevronRight
+															size={15}
+															className="text-muted-foreground"
+														/>
+													)}
+												</button>
+												<div>{cat.name}</div>
+												<button
+													onClick={() => {
+														setOpenPopup(isPopupOpen ? null : cat.name);
+														setNewItemName("");
+													}}
+												>
+													<CirclePlus size={18} className="text-blue-600" />
+												</button>
+											</div>
+
+											<div className="text-right w-1/6 font-semibold">$0.00</div>
+											<div className="text-right w-1/6 font-semibold">$0.00</div>
+											<div className="text-right w-1/6 font-semibold">$0.00</div>
 										</div>
-
-										<div className="text-right w-1/6 font-semibold">$0.00</div>
-										<div className="text-right w-1/6 font-semibold">$0.00</div>
-										<div className="text-right w-1/6 font-semibold">$0.00</div>
+										{isPopupOpen && (
+											<div
+												ref={popupRef}
+												className="absolute top-full left-10 w-[15vw] bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-xl shadow-lg p-4 z-50"
+											>
+												<div className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
+													Add Item
+												</div>
+												<input
+													type="text"
+													placeholder="Enter Item Name"
+													value={newItemName}
+													onChange={(e) => setNewItemName(e.target.value)}
+													className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
+												/>
+												<div className="flex justify-end gap-2">
+													<button
+														onClick={() => setOpenPopup(null)}
+														className="px-3 py-1.5 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
+													>
+														Cancel
+													</button>
+													<button
+														onClick={() => handleAssign(cat.id)}
+														className="px-3 py-1.5 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
+													>
+														Add
+													</button>
+												</div>
+											</div>
+										)}
 									</div>
-									{isPopupOpen && (
-										<div
-											ref={popupRef}
-											className="absolute top-full left-10 w-[15vw] bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-xl shadow-lg p-4 z-50"
-										>
-											<div className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
-												Add Item
-											</div>
-											<input
-												type="text"
-												placeholder="Enter Item Name"
-												value={newItemName}
-												onChange={(e) => setNewItemName(e.target.value)}
-												className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
-											/>
-											<div className="flex justify-end gap-2">
+									{/* Items */}
+									{isOpen && (
+										<div className="bg-white dark:bg-[#1c1c1e] group">
+											{cat.items.map((item) => (
 												<button
-													onClick={() => setOpenPopup(null)}
-													className="px-3 py-1.5 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
+													key={item.id}
+													onClick={() => handleSelectedItem(item)}
+													className="w-full h-fit flex justify-between items-center px-8 py-2 text-sm border-b border-gray-300 dark:border-gray-700 hover:bg-[#dee6ff] dark:hover:bg-[#5d616b] active:bg-[#c6d3fd]"
 												>
-													Cancel
+													<div className="w-1/2 truncate flex items-center gap-x-2">
+														{item.title}
+													</div>
+													<div className="w-1/6 text-right">
+														$
+														{item.appliedAmount.toLocaleString("en-US", {
+															minimumFractionDigits: 0,
+															maximumFractionDigits: 2,
+														})}
+													</div>
+													<div className="w-1/6 text-right">
+														$
+														{localizeNumber(item.total)}
+													</div>
+													<div className="w-1/6 text-right">
+														$
+														{(
+															item.total - item.appliedAmount
+														).toLocaleString("en-US", {
+															minimumFractionDigits: 0,
+															maximumFractionDigits: 2,
+														})}
+													</div>
 												</button>
-												<button
-													onClick={() => handleAssign(cat.id)}
-													className="px-3 py-1.5 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
-												>
-													Add
-												</button>
-											</div>
+											))}
 										</div>
 									)}
 								</div>
-								{/* Items */}
-								{isOpen && (
-									<div className="bg-white dark:bg-[#1c1c1e] group">
-										{cat.items.map((item) => (
-											<button
-												key={item.id}
-												onClick={() => handleSelectedItem(item)}
-												className="w-full h-fit flex justify-between items-center px-8 py-2 text-sm border-b border-gray-300 dark:border-gray-700 hover:bg-[#dee6ff] dark:hover:bg-[#5d616b] active:bg-[#c6d3fd]"
-											>
-												<div className="w-1/2 truncate flex items-center gap-x-2">
-													{item.title}
-												</div>
-												<div className="w-1/6 text-right">
-													$
-													{item.appliedAmount.toLocaleString("en-US", {
-														minimumFractionDigits: 0,
-														maximumFractionDigits: 2,
-													})}
-												</div>
-												<div className="w-1/6 text-right">
-													$
-													{localizeNumber(item.total)}
-												</div>
-												<div className="w-1/6 text-right">
-													$
-													{(
-														item.total - item.appliedAmount
-													).toLocaleString("en-US", {
-														minimumFractionDigits: 0,
-														maximumFractionDigits: 2,
-													})}
-												</div>
-											</button>
-										))}
-									</div>
-								)}
-							</div>
-						);
-					})}
+							);
+						})}
+					</div>
 				</div>
 			</div>
 			{/* Side panel */}
