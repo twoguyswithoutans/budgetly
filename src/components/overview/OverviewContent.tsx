@@ -1,13 +1,29 @@
 "use client";
 import { useState, useEffect } from "react";
+import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, Tooltip, ResponsiveContainer } from "recharts";
 import { useRouter } from "next/navigation";
 import { startOfMonth, endOfMonth, subMonths, format, parseISO, isAfter, isBefore } from "date-fns";
+import { Scroll } from "lucide-react";
 
 const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
+const EmptyState = ({ message }: { message: string }) => (
+	<div className="flex flex-col items-center justify-center text-gray-500 dark:text-gray-400 h-[200px]">
+		<div className="text-3xl mb-2">
+			<Scroll size={25} />
+		</div>
+		<p className="text-sm font-medium">{message}</p>
+	</div>
+);
+
+const EmptyMiniState = ({ message }: { message: string }) => (
+	<p className="text-sm text-gray-500 dark:text-gray-400">{message}</p>
+);
+
 export default function Overview() {
+	const [loading, setLoading] = useState(true);
 	const router = useRouter();
 	const [showAI, setShowAI] = useState(false);
 	const [filter, setFilter] = useState("This Month");
@@ -47,6 +63,7 @@ export default function Overview() {
 
 	useEffect(() => {
 		const fetchData = async () => {
+			setLoading(true);
 			const { data: categories } = await supabase
 				.from("categories")
 				.select(
@@ -146,6 +163,7 @@ export default function Overview() {
 			];
 
 			setGoals(allGoals);
+			setLoading(false);
 		};
 
 		fetchData();
@@ -178,6 +196,10 @@ export default function Overview() {
 		{ title: "Total Expenses", value: summary.expenses, color: "text-red-600" },
 		{ title: "Net Worth", value: summary.savings, color: "text-blue-600" },
 	];
+
+	if (loading) {
+		return <Loader title="Overview" />;
+	}
 
 	return (
 		<div className="p-6 space-y-8">
@@ -221,6 +243,7 @@ export default function Overview() {
 					)}
 				</div>
 			</div>
+
 			{/* Summary Cards */}
 			<div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
 				{total.map((item, i) => (
@@ -239,81 +262,98 @@ export default function Overview() {
 					</div>
 				))}
 			</div>
+
 			{/* Charts */}
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				{/* Spending Breakdown */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-4">
 					<div className="font-semibold mb-3">Spending Breakdown</div>
-					<ResponsiveContainer width="100%" height={250}>
-						<PieChart>
-							<Pie
-								data={spendingData}
-								cx="50%"
-								cy="50%"
-								innerRadius={30}
-								outerRadius={90}
-								paddingAngle={2}
-								dataKey="value"
-								label={({ name, percent }) =>
-									`${name} ${(percent * 100).toFixed(0)}%`
-								}
-							>
-								{spendingData.map((entry, index) => (
-									<Cell
-										key={`cell-${index}`}
-										fill={COLORS[index % COLORS.length]}
-									/>
-								))}
-							</Pie>
-							<Tooltip />
-						</PieChart>
-					</ResponsiveContainer>
+					{spendingData.length === 0 ? (
+						<EmptyState message="No spending recorded for this period" />
+					) : (
+						<ResponsiveContainer width="100%" height={250}>
+							<PieChart>
+								<Pie
+									data={spendingData}
+									cx="50%"
+									cy="50%"
+									innerRadius={30}
+									outerRadius={90}
+									paddingAngle={2}
+									dataKey="value"
+									label={({ name, percent }) =>
+										`${name} ${(percent * 100).toFixed(0)}%`
+									}
+								>
+									{spendingData.map((entry, index) => (
+										<Cell
+											key={`cell-${index}`}
+											fill={COLORS[index % COLORS.length]}
+										/>
+									))}
+								</Pie>
+								<Tooltip />
+							</PieChart>
+						</ResponsiveContainer>
+					)}
 				</div>
+
 				{/* Income vs Expenses */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-4">
 					<h2 className="font-semibold mb-3">Income vs Expenses</h2>
-					<ResponsiveContainer width="100%" height={250}>
-						<LineChart data={trendData}>
-							<XAxis dataKey="month" />
-							<YAxis />
-							<Tooltip />
-							<Line
-								type="monotone"
-								dataKey="income"
-								stroke="#10b981"
-								strokeWidth={2}
-							/>
-							<Line
-								type="monotone"
-								dataKey="expenses"
-								stroke="#ef4444"
-								strokeWidth={2}
-							/>
-						</LineChart>
-					</ResponsiveContainer>
+					{trendData.length === 0 ? (
+						<EmptyState message="No income or expense data for this period" />
+					) : (
+						<ResponsiveContainer width="100%" height={250}>
+							<LineChart data={trendData}>
+								<XAxis dataKey="month" />
+								<YAxis />
+								<Tooltip />
+								<Line
+									type="monotone"
+									dataKey="income"
+									stroke="#10b981"
+									strokeWidth={2}
+								/>
+								<Line
+									type="monotone"
+									dataKey="expenses"
+									stroke="#ef4444"
+									strokeWidth={2}
+								/>
+							</LineChart>
+						</ResponsiveContainer>
+					)}
 				</div>
 			</div>
+
 			{/* Goal Progress */}
 			<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-6">
 				<h2 className="font-semibold mb-4">Goal Progress</h2>
-				<div className="space-y-3">
-					{goals.map((goal, i) => (
-						<div key={i}>
-							<div className="flex justify-between text-sm font-medium text-primary">
-								<span>{goal.name}</span>
-								<span>{goal.progress}%</span>
+				{goals.length === 0 ? (
+					<EmptyMiniState message="No debt or savings goals added yet" />
+				) : (
+					<div className="space-y-3">
+						{goals.map((goal, i) => (
+							<div key={i}>
+								<div className="flex justify-between text-sm font-medium text-primary">
+									<span>{goal.name}</span>
+									<span>{goal.progress}%</span>
+								</div>
+								<div className="w-full bg-gray-200 rounded-full h-2">
+									<div
+										className={`h-2 rounded-full transition-all ${
+											goal.type === "saving"
+												? "bg-[#22c55e]"
+												: "bg-[#ef4444]"
+										}`}
+										style={{ width: `${goal.progress}%` }}
+									></div>
+								</div>
 							</div>
-							<div className="w-full bg-gray-200 rounded-full h-2">
-								<div
-									className={`h-2 rounded-full transition-all ${
-										goal.type === "saving" ? "bg-[#22c55e]" : "bg-[#ef4444]"
-									}`}
-									style={{ width: `${goal.progress}%` }}
-								></div>
-							</div>
-						</div>
-					))}
-				</div>
+						))}
+					</div>
+				)}
 				<button
 					onClick={() => router.push("/goals")}
 					className="mt-4 text-blue-600 text-sm font-medium hover:underline"
@@ -335,17 +375,18 @@ export default function Overview() {
 					Ask AI for insights
 				</button>
 			</div>
+
 			{/* AI Popup */}
 			{showAI && (
 				<div className="fixed -inset-10 bg-black/40 flex items-center justify-center z-50">
 					<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow-lg w-full max-w-md p-6">
 						<div className="text-lg font-semibold mb-2">AI Insights</div>
 						<div className="text-primary mb-4 text-sm whitespace-pre-wrap">
-							{aiLoading
-								? "Analyzing your data…"
-								: aiError
-								? `Error: ${aiError}`
-								: aiText || "(No insights yet for this period.)"}
+							{(() => {
+								if (aiLoading) return "Analyzing your data…";
+								if (aiError) return `Error: ${aiError}`;
+								return aiText || "(No insights yet for this period.)";
+							})()}
 						</div>
 						<button
 							onClick={() => setShowAI(false)}

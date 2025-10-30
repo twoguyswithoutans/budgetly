@@ -1,5 +1,6 @@
-import { supabase } from "@/lib/supabaseClient";
 import { useState, useRef, useEffect } from "react";
+import Loader from "Loader";
+import { supabase } from "@/lib/supabaseClient";
 import { ChevronDown, ChevronRight, CirclePlus, Undo, Redo, History } from "lucide-react";
 import ContentSidePanel from "./ContentSidePanel";
 import { format } from "date-fns";
@@ -27,6 +28,7 @@ interface DashboardContentTriggerRefreshProp {
 }
 
 export default function DashboardContent({ onTriggerRefresh, currentMonth }: Readonly<DashboardContentTriggerRefreshProp>) {
+	const [loading, setLoading] = useState(true);
 	const [openCategories, setOpenCategories] = useState<string[]>([]);
 	const [openPopup, setOpenPopup] = useState<string | null>(null);
 	const [newItemName, setNewItemName] = useState("");
@@ -37,6 +39,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 
 	useEffect(() => {
 		async function fetchCategories() {
+			setLoading(true);
 			const start = format(currentMonth, "yyyy-MM-01");
 			const end = format(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0), "yyyy-MM-dd");
 
@@ -45,7 +48,10 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				.select("id, name, items (*)")
 				.order("name", { ascending: true });
 
-			if (error) console.error("Error fetching categories:", error);
+			if(error) {
+				console.error("Error fetching categories:", error)
+				setLoading(false);
+			}
 			else {
 				const filtered = data.map((cat: any) => ({
 					...cat,
@@ -57,6 +63,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				.map((cat: any) => cat.name);
 				setOpenCategories(autoOpen);
 			}
+			setLoading(false);
 		}
 		fetchCategories();
 	}, [currentMonth]);
@@ -172,6 +179,12 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 			maximumFractionDigits: 2,
 		});
 	};
+
+	if(loading) {
+		return (
+			<Loader title="Dashboard" />
+		)
+	}
 
 	return (
 		<div className="flex flex-col md:flex-row w-full h-screen">

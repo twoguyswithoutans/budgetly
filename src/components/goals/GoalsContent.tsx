@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
+import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
-import { Edit, Trash2, CheckCircle, AlertTriangle, Wallet, CreditCard, Target } from "lucide-react";
+import { Scroll, Edit, Trash2, CheckCircle, AlertTriangle, Wallet, CreditCard, Target } from "lucide-react";
 
 type Goal = {
 	id: string;
@@ -17,12 +18,14 @@ interface GoalsContentTriggerRefreshProp {
 }
 
 export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContentTriggerRefreshProp>) {
+	const [loading, setLoading] = useState(true);
 	const [goals, setGoals] = useState<Goal[]>([]);
 	const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 	const [addAmount, setAddAmount] = useState("");
 
 	useEffect(() => {
 		const fetchGoals = async () => {
+			setLoading(true);
 			const { data, error } = await supabase
 				.from("categories")
 				.select("id, name, items ( id, title, total, appliedAmount, dueDate )")
@@ -31,6 +34,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			if (error) {
 				console.error("Error fetching goals:", error);
 				setGoals([]);
+				setLoading(false);
 				return;
 			}
 
@@ -47,6 +51,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 				);
 
 			setGoals(mapped);
+			setLoading(false);
 		};
 
 		fetchGoals();
@@ -85,7 +90,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 	};
 
 	const handleAddAmount = async () => {
-		if (!addAmount || isNaN(Number(addAmount)) || !editingGoal) return;
+		if(!addAmount || isNaN(Number(addAmount)) || !editingGoal) return;
 
 		const add = Number(addAmount);
 		const newCurrent = Math.min(editingGoal.current + add, editingGoal.target);
@@ -95,7 +100,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			.update({ appliedAmount: newCurrent })
 			.eq("id", editingGoal.id);
 
-		if (error) {
+		if(error) {
 			console.error("Error updating goal amount:", error);
 			return;
 		}
@@ -150,6 +155,23 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 
 	const today = new Date();
 
+	if(loading) {
+		return (
+			<Loader title="Goals" />
+		)
+	}
+
+	if(goals.length === 0) {
+		return (
+			<div className="flex flex-col items-center justify-center w-full h-full text-gray-500 dark:text-gray-400">
+				<div className="text-4xl mb-3">
+					<Scroll size={50} />
+				</div>
+				<div className="text-lg font-semibold">No goals yet</div>
+				<div className="text-sm opacity-70 mb-4">No debt or savings goals added yet</div>
+			</div>
+		)
+	}
 	return (
 		<div className="flex flex-col w-full h-full bg-background dark:bg-[#1c1c1e] text-foreground p-6 gap-6 overflow-auto">
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

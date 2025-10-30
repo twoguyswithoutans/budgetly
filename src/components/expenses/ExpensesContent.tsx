@@ -1,5 +1,6 @@
 "use client";
 import React, { useEffect, useMemo, useState } from "react";
+import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
 import ExpensesChartCard from "./ExpensesChartCard";
 import { format, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
@@ -18,9 +19,8 @@ function sum(arr: number[]) {
 }
 
 export default function ExpensesContent() {
-	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [loading, setLoading] = useState(true);
-
+	const [transactions, setTransactions] = useState<Transaction[]>([]);
 	const [rangePreset, setRangePreset] = useState
 		<"this_month" | "last_3_months" | "this_year" | "all_time" | "custom">("this_month");
 	const [customFrom, setCustomFrom] = useState<string>("2024-01-01");
@@ -44,13 +44,13 @@ export default function ExpensesContent() {
 				.from("items")
 				.select(`id, title, total, appliedAmount, dateAdded, dueDate, repeatMonthly, categories(name)`);
 
-			if (incomeCategory) {
+			if(incomeCategory) {
 				query = query.neq("category_id", incomeCategory.id);
 			}
 
 			const { data, error } = await query;
 
-			if (error) {
+			if(error) {
 				console.error("Error fetching items:", error);
 				setTransactions([]);
 				setLoading(false);
@@ -194,10 +194,8 @@ export default function ExpensesContent() {
 
 	if(loading) {
 		return (
-			<div className="w-full h-[90vh] flex items-center justify-center text-gray-500">
-				Loading expenses...
-			</div>
-		);
+			<Loader title="expenses" />
+		)
 	}
 	return (
 		<div className="w-full h-full flex">

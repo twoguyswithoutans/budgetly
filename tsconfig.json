@@ -25,7 +25,8 @@
       "dashboard/*": ["./src/components/dashboard/*"],
       "expenses/*": ["./src/components/expenses/*"],
       "goals/*": ["./src/components/goals/*"],
-      "overview/*": ["./src/components/overview/*"]
+      "overview/*": ["./src/components/overview/*"],
+      "Loader": ["./src/components/loader/Loader.tsx"],
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "jest.setup.ts"],
