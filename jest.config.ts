@@ -1,14 +1,17 @@
-// jest.config.ts
-import type { Config } from 'jest';
+const nextJest = require('next/jest');
 
-const config: Config = {
-  preset: 'ts-jest',
+const createJestConfig = nextJest({ dir: './' });
+
+const customJestConfig = {
   testEnvironment: 'jsdom',
-  roots: ['<rootDir>/src', '<rootDir>/tests'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  collectCoverageFrom: ['src/**/*.{ts,tsx}', '!src/**/*.d.ts'],
-  setupFilesAfterEnv: ['<rootDir>/tests/setupTests.ts'],
-  coverageDirectory: 'coverage',
+  transform: {
+    '^.+\\.(js|jsx|ts|tsx)$': ['babel-jest', { configFile: './babel-jest.config.js' }],
+  },
+  setupFilesAfterEnv: [require.resolve('./jest.setup.ts')],
+  moduleNameMapper: {
+    '^@/(.*)$': '<rootDir>/src/$1',
+    '\\.(css|less|scss|sass)$': 'identity-obj-proxy',
+  },
 };
 
-export default config;
+module.exports = createJestConfig(customJestConfig);

@@ -192,14 +192,13 @@ export default function ExpensesContent() {
 
 	const resetCategories = () => setSelectedCategories(null);
 
-	if (loading) {
+	if(loading) {
 		return (
 			<div className="w-full h-[90vh] flex items-center justify-center text-gray-500">
 				Loading expenses...
 			</div>
 		);
 	}
-
 	return (
 		<div className="w-full h-full flex">
 			<div className="w-full h-[90vh] flex flex-col">

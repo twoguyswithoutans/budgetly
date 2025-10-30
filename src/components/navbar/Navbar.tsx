@@ -32,7 +32,7 @@ export default function Navbar() {
                     Budgetly
                 </div>
             </div>
-            <div className="hidden py-4 px-3 w-full h-fit md:flex flex-col gap-y-3 justify-center items-start text-white">
+            <div className="py-4 px-3 w-full h-fit md:flex flex-col gap-y-3 justify-center items-start text-white">
                 {navItems.map((item) => {
                     const path = item.name.toLowerCase() === "dashboard" ? "/" : `/${item.name.toLowerCase()}`;
                     const isActive = pathname === path;
@@ -40,18 +40,17 @@ export default function Navbar() {
                         <button
                             key={item.name}
                             onClick={() => router.push(path)}
-                            className={`w-full rounded-lg py-3 px-4 gap-x-3 flex justify-start items-center text-sm font-extrabold transition-colors cursor-pointer
+                            className={`w-full rounded-lg py-3 px-4 gap-x-3 flex justify-start items-center text-white text-sm font-extrabold transition-colors cursor-pointer
                             ${
                                 isActive
-                                ? "bg-[#345b88] text-white"
-                                : "text-white md:hover:bg-[#274a72] md:active:bg-[#36379f]"
+                                ? "bg-[#345b88]"
+                                : "md:hover:bg-[#274a72] md:active:bg-[#36379f]"
                             }`}
                         >
                             <div>
                                 {item.icon}
                             </div>
                             <div>
-
                                 {item.name}
                             </div>
                         </button>

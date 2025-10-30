@@ -22,15 +22,12 @@
       "@/*": ["./src/*"],
       "components/*": ["./src/components/*"],
       "navbar/*": ["./src/components/navbar/*"],
-      "overlay/*": ["./src/components/overlay/*"],
-      "models/*": ["./src/models/*"],
-      "income/*": ["./src/mutations/income/*"],
-      "expense/*": ["./src/mutations/expense/*"],
-      "limit/*": ["./src/mutations/limit/*"],
-      "cards/*": ["./src/components/cards/*"],
-      "dashboard/*": ["./src/components/dashboard/*"]
+      "dashboard/*": ["./src/components/dashboard/*"],
+      "expenses/*": ["./src/components/expenses/*"],
+      "goals/*": ["./src/components/goals/*"],
+      "overview/*": ["./src/components/overview/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "jest.setup.ts"],
   "exclude": ["node_modules"]
 }

@@ -1,4 +1,4 @@
-import OverviewContent from 'components/overview/OverviewContent'
+import OverviewContent from "overview/OverviewContent";
 
 export default function Page() {
     return (

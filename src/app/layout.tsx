@@ -33,7 +33,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 					disableTransitionOnChange
 				>
 					<Navbar />
-					{children}
+					<div className="w-full flex items-center justify-center">
+						{children}
+					</div>
 				</ThemeProvider>
 			</body>
 		</html>
