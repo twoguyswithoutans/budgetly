@@ -21,7 +21,7 @@ export default function ExpensesChartCard({ totalSpending, filteredCount, dateFr
 	const total = totalSpending || filteredData.reduce((sum, item) => sum + item.value, 0);
 
 	return (
-		<div className="w-full h-[70vh] bg-white dark:bg-[#1c1c1e] rounded-2xl shadow p-5 gap-5 flex flex-col justify-start items-start border border-gray-300 dark:border-gray-700">
+		<div className="w-full h-[80vh] bg-white dark:bg-[#1c1c1e] rounded-2xl shadow p-5 gap-5 flex flex-col justify-start items-start border border-gray-300 dark:border-gray-700">
 			{/* Main Content */}
 			<div className="flex flex-col justify-start space-y-2">
 				<div className="text-lg font-semibold text-foreground">Total Spending</div>

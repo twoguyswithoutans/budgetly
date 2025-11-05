@@ -1,6 +1,6 @@
 import { supabase } from '@/lib/supabaseClient';
 import { useState, useEffect } from "react";
-import { HandCoins, Save, Trash } from "lucide-react";
+import { HandCoins, Save, Trash, X } from "lucide-react";
 import { format } from "date-fns";
 
 interface ContentSidePanelProps {
@@ -16,6 +16,7 @@ interface ContentSidePanelProps {
 	};
 	onSave: (updatedItem?: any) => void;
 	onDelete: ((id: string) => void );
+	onClose: () => void;
 }
 
 function safeAdd(a: unknown, b: unknown): number {
@@ -32,7 +33,7 @@ function safeDiff(a: unknown, b: unknown): number {
 	return numA - numB;
 }
 
-export default function ContentSidePanel({ item, onSave, onDelete }: Readonly<ContentSidePanelProps>) {
+export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Readonly<ContentSidePanelProps>) {
 	const [isRepeat, setIsRepeat] = useState(false);
 	const currentDate = format(new Date(), "yyyy-MM-dd");
 	const [editable, setEditable] = useState(item);
@@ -90,8 +91,15 @@ export default function ContentSidePanel({ item, onSave, onDelete }: Readonly<Co
 	};
 
 	return (
-		<div className="px-3 py-2 w-full h-full shadow-md flex flex-col gap-6">
-			<div className="text-xl font-bold">{item?.title}</div>
+		<div className="absolute top-0 bg-background py-5 px-5 md:py-5 w-screen md:w-full h-full shadow-md flex flex-col gap-6 z-50 overflow-auto ">
+			<div className="flex justify-between items-center">
+				<div className="text-xl font-bold">{item?.title}</div>
+				<button
+					onClick={() => onClose()}
+					className="text-xl font-bold">
+					<X size={20} />
+				</button>
+			</div>
 			<div>
 				<div className="w-full h-fit flex flex-col gap-y-3 bg-white dark:bg-[rgb(28,28,30)] rounded-lg p-5">
 					<div className="text-sm font-semibold pb-3 text-gray-800 dark:text-gray-200 border-b border-background">
@@ -157,7 +165,7 @@ export default function ContentSidePanel({ item, onSave, onDelete }: Readonly<Co
 							name="dateAdded"
 							value={editable?.dateAdded ?? currentDate}
 							onChange={handleChange}
-							className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
+							className="w-fit border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
 						/>
 						<button
 							onClick={() => completeAmount()}
@@ -186,7 +194,6 @@ export default function ContentSidePanel({ item, onSave, onDelete }: Readonly<Co
 							</span>
 						</div>
 					</div>
-
 					<div className="flex justify-between gap-2 mt-5">
 						<button
 							onClick={() => {

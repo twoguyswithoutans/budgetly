@@ -2,6 +2,8 @@ import { useState, useRef, useEffect } from "react";
 import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
 import { ChevronDown, ChevronRight, CirclePlus, Undo, Redo, History } from "lucide-react";
+import DashboardToolbar from "dashboard/DashboardToolbar";
+import DashboardTitleBar from "dashboard/DashboardTitleBar";
 import ContentSidePanel from "./ContentSidePanel";
 import { format } from "date-fns";
 
@@ -171,6 +173,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 
 		setSelectedItem(updatedItem);
 		onTriggerRefresh();
+		setSelectedItem(undefined)
 	};
 
 	const localizeNumber = (number: number) => {
@@ -182,38 +185,20 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 
 	if(loading) {
 		return (
-			<Loader title="Dashboard" />
+			<div className="flex justify-center items-center h-[65svh] md:h-[80svh]">
+				<Loader title="Dashboard" />
+			</div>
 		)
 	}
 
 	return (
-		<div className="flex flex-col md:flex-row w-full h-screen">
-			<div className="w-full flex flex-col bg-white dark:bg-[#1c1c1e] text-foreground overflow-hidden border-r border-gray-300 dark:border-gray-700">
-				{/* Toolbar */}
-				<div className="flex justify-start items-center p-2 gap-x-5 bg-secondary/40 border-b border-gray-300 dark:border-gray-700 text-sm">
-					<button className="flex items-center gap-x-1 text-gray-500 hover:text-gray-700">
-						<Undo size={15} />
-						Undo
-					</button>
-					<button className="flex items-center gap-x-1 text-gray-500 hover:text-gray-700">
-						<Redo size={15} />
-						Redo
-					</button>
-					<button className="flex items-center gap-x-1 text-blue-600 hover:underline">
-						<History size={15} />
-						Recent Moves
-					</button>
+		<div className="flex flex-col md:flex-row w-full">
+			<div className="w-screen md:w-[55vw] flex flex-col bg-white dark:bg-[#1c1c1e] text-foreground overflow-hidden border-r border-gray-300 dark:border-gray-700">
+				<div className="w-full h-[10svh] z-40">
+					<DashboardToolbar />
+					<DashboardTitleBar />
 				</div>
-
-				<div className="h-[85vh] flex flex-col gap-x-10">
-					{/* Table Header */}
-					<div className="flex justify-between text-xs font-semibold bg-muted/40 border-b border-gray-300 dark:border-gray-700 px-6 py-2 text-muted-foreground">
-						<div className="w-1/2 text-left">Category</div>
-						<div className="w-1/6 text-right">Applied</div>
-						<div className="w-1/6 text-right">Total</div>
-						<div className="w-1/6 text-right">Remaining</div>
-					</div>
-
+				<div className="w-full h-[65svh] md:h-[80svh] flex flex-col gap-x-10">
 					<div className="h-full overflow-auto">
 						{/* Categories */}
 						{categories?.map((cat) => {
@@ -225,7 +210,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 									{/* Category Header */}
 									<div className="relative">
 										<div className="flex items-center justify-between px-6 py-3 bg-background hover:bg-secondary border-b border-gray-300 dark:border-gray-700">
-											<div className="w-1/2 flex items-center gap-x-3 font-bold relative">
+											<div className="flex-[2] flex items-center gap-x-3 font-bold relative">
 												<button
 													onClick={() => {
 														if(isOpen) {
@@ -260,14 +245,14 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 												</button>
 											</div>
 
-											<div className="text-right w-1/6 font-semibold">$0.00</div>
-											<div className="text-right w-1/6 font-semibold">$0.00</div>
-											<div className="text-right w-1/6 font-semibold">$0.00</div>
+											<div className="text-right flex-1 font-semibold">$0.00</div>
+											<div className="text-right flex-1 font-semibold">$0.00</div>
+											<div className="text-right flex-1 font-semibold">$0.00</div>
 										</div>
 										{isPopupOpen && (
 											<div
 												ref={popupRef}
-												className="absolute top-full left-10 w-[15vw] bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-xl shadow-lg p-4 z-50"
+												className="absolute top-full left-10 w-[50vw] md:w-[15vw] bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-xl shadow-lg p-4 z-20"
 											>
 												<div className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
 													Add Item
@@ -305,21 +290,21 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 													onClick={() => handleSelectedItem(item)}
 													className="w-full h-fit flex justify-between items-center px-8 py-2 text-sm border-b border-gray-300 dark:border-gray-700 hover:bg-[#dee6ff] dark:hover:bg-[#5d616b] active:bg-[#c6d3fd]"
 												>
-													<div className="w-1/2 truncate flex items-center gap-x-2">
+													<div className="flex-[2] truncate flex items-center gap-x-2">
 														{item.title}
 													</div>
-													<div className="w-1/6 text-right">
+													<div className="flex-1 text-right">
 														$
 														{item.appliedAmount.toLocaleString("en-US", {
 															minimumFractionDigits: 0,
 															maximumFractionDigits: 2,
 														})}
 													</div>
-													<div className="w-1/6 text-right">
+													<div className="flex-1 text-right">
 														$
 														{localizeNumber(item.total)}
 													</div>
-													<div className="w-1/6 text-right">
+													<div className="flex-1 text-right">
 														$
 														{(
 															item.total - item.appliedAmount
@@ -339,15 +324,16 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				</div>
 			</div>
 			{/* Side panel */}
-			<div className="w-[35vw]">
+			<div className="md:relative md:w-[25vw]">
 				{selectedItem ? (
 					<ContentSidePanel
 						item={selectedItem}
 						onSave={handleSaveItem}
+						onClose={() => setSelectedItem(undefined)}
 						onDelete={handleItemDelete}
 					/>
 				) : (
-					<div className="h-full flex items-center justify-center text-gray-400">
+					<div className="hidden md:h-full md:flex items-center justify-center text-gray-400">
 						Select an item to view or edit.
 					</div>
 				)}

@@ -198,8 +198,8 @@ export default function ExpensesContent() {
 		)
 	}
 	return (
-		<div className="w-full h-full flex">
-			<div className="w-full h-[90vh] flex flex-col">
+		<div className="w-full h-[90svh] flex flex-col md:flex-row">
+			<div className="w-full flex flex-col">
 				<div className="bg-white dark:bg-[#1c1c1e] flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 border-b border-gray-300 dark:border-gray-700">
 					<div className="flex items-center gap-3 flex-wrap">
 						<div className="text-sm font-semibold">Show Categories:</div>
@@ -320,7 +320,7 @@ export default function ExpensesContent() {
 				</div>
 			</div>
 			{/* Right Side Panel */}
-			<div className="w-[35vw] h-[90vh] border-l border-gray-300 dark:border-gray-700">
+			<div className="w-full md:w-[35vw] h-fit md:h-[90svh] md:border-l border-gray-300 dark:border-gray-700 pb-[10svh] md:pb-0">
 				<div className="bg-white dark:bg-[#1c1c1e] p-4 h-full flex flex-col">
 					<div className="text-lg font-bold mb-3">Transactions</div>
 					<div className="text-sm text-gray-500 mb-3">

@@ -173,7 +173,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 		)
 	}
 	return (
-		<div className="flex flex-col w-full h-full bg-background dark:bg-[#1c1c1e] text-foreground p-6 gap-6 overflow-auto">
+		<div className="flex flex-col w-full h-[90svh] bg-background dark:bg-[#1c1c1e] text-foreground p-6 gap-6 overflow-auto pb-[10svh] md:pb-0">
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				{/* Summary */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6 flex flex-col justify-start gap-y-3">
@@ -208,7 +208,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 				</div>
 
 				{/* Chart */}
-				<div className="w-full bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-4 flex justify-center items-center">
+				<div className="md:w-full h-[50svh] md:h-full bg-white dark:bg-[#2a2a2d] rounded-xl shadow md:p-4 flex justify-center items-center">
 					<ResponsiveContainer>
 						<PieChart margin={{ top: 10, right: 45, bottom: 10, left: 0 }}>
 							<Pie
@@ -345,7 +345,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			</div>
 			{/* Completed Goals */}
 			{completedGoals.length > 0 && (
-				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6">
+				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6 mb-4">
 					<h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Completed Goals</h3>
 					{completedGoals.map((goal) => (
 						<div

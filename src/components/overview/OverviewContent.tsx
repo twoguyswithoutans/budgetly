@@ -129,11 +129,10 @@ export default function Overview() {
 					if (isBefore(date, fromDate) || isAfter(date, toDate)) return;
 
 					const month = new Date(item.dateAdded).toLocaleString("en", {
-						month: "short",
+						month: "short"
 					});
 					if (!monthMap[month]) monthMap[month] = { income: 0, expenses: 0 };
-					if (cat.name === "Income")
-						monthMap[month].income += Number(item.appliedAmount ?? 0);
+					if (cat.name === "Income") monthMap[month].income += Number(item.appliedAmount ?? 0);
 					else monthMap[month].expenses += Number(item.appliedAmount ?? 0);
 				});
 			});
@@ -202,7 +201,7 @@ export default function Overview() {
 	}
 
 	return (
-		<div className="p-6 space-y-8">
+		<div className="p-6 space-y-8 h-[90svh] md:h-screen overflow-auto">
 			{/* Header */}
 			<div className="flex justify-between items-center flex-wrap gap-4">
 				<div>
@@ -379,7 +378,7 @@ export default function Overview() {
 			{/* AI Popup */}
 			{showAI && (
 				<div className="fixed -inset-10 bg-black/40 flex items-center justify-center z-50">
-					<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow-lg w-full max-w-md p-6">
+					<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow-lg w-[80vw] md:w-full max-w-md p-6">
 						<div className="text-lg font-semibold mb-2">AI Insights</div>
 						<div className="text-primary mb-4 text-sm whitespace-pre-wrap">
 							{(() => {
