@@ -1,5 +1,6 @@
 "use client";
-import { PieChart, Pie, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { EmptyMiniState } from "emptyStates/EmptyMiniState";
+import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, ResponsiveContainer, Tooltip } from "recharts";
 
 type ChartItem = {
 	name: string;
@@ -21,7 +22,7 @@ export default function ExpensesChartCard({ totalSpending, filteredCount, dateFr
 	const total = totalSpending || filteredData.reduce((sum, item) => sum + item.value, 0);
 
 	return (
-		<div className="w-full h-[80vh] bg-white dark:bg-[#1c1c1e] rounded-2xl shadow p-5 gap-5 flex flex-col justify-start items-start border border-gray-300 dark:border-gray-700">
+		<div className="w-full h-fit md:h-[80vh] bg-white dark:bg-[#1c1c1e] md:rounded-2xl shadow p-5 gap-5 flex flex-col justify-start items-start border-y md:border border-gray-300 dark:border-gray-700">
 			{/* Main Content */}
 			<div className="flex flex-col justify-start space-y-2">
 				<div className="text-lg font-semibold text-foreground">Total Spending</div>
@@ -33,36 +34,34 @@ export default function ExpensesChartCard({ totalSpending, filteredCount, dateFr
 					<span className="font-semibold">{dateTo}</span>
 				</p>
 			</div>
-			{/* Pie Chart */}
-			<div className="h-[320px] w-full flex justify-center items-center overflow-auto">
+			{/* Bar Chart */}
+			<div className="h-[320px] w-full flex justify-center items-center overflow-auto text-black">
 				{filteredData.length > 0 ? (
-					<ResponsiveContainer>
-						<PieChart margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
-							<Pie
-								data={filteredData}
-								cx="50%"
-								cy="50%"
-								innerRadius={30}
-								outerRadius={90}
-								paddingAngle={2}
-								dataKey="value"
-								label={({ name, percent }) =>
-									`${name} ${(percent * 100).toFixed(0)}%`
-								}
-							>
-								{filteredData.map((entry, index) => (
-									<Cell
-										key={`cell-${index}`}
-										fill={COLORS[index % COLORS.length]}
-									/>
-								))}
-							</Pie>
-							<Tooltip />
-							<Legend verticalAlign="bottom" height={40} />
-						</PieChart>
-					</ResponsiveContainer>
+				<ResponsiveContainer width="100%" height="100%">
+					<BarChart
+						data={filteredData}
+						margin={{ top: 10, right: 10, left: 0, bottom: 0 }}
+					>
+						<CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+						<XAxis
+							dataKey="name"
+							angle={-15}
+							textAnchor="end"
+							interval={0}
+							height={60}
+							tick={{ fontSize: 14 }}
+						/>
+						<YAxis tick={{ fontSize: 12 }} />
+						<Tooltip />
+						<Bar dataKey="value" radius={[4, 4, 0, 0]}>
+							{filteredData.map((_, index) => (
+								<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+							))}
+						</Bar>
+					</BarChart>
+				</ResponsiveContainer>
 				) : (
-					<p className="text-gray-500 italic text-sm">No spending data to display</p>
+					<EmptyMiniState message="spending" />
 				)}
 			</div>
 		</div>

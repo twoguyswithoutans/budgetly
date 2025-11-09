@@ -1,7 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
-import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { EmptyMiniState } from "emptyStates/EmptyMiniState";
+import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Scroll, Edit, Trash2, CheckCircle, AlertTriangle, Wallet, CreditCard, Target } from "lucide-react";
 
 type Goal = {
@@ -196,7 +197,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 							${totalDebts.toFixed(2)} / ${totalDebtsTarget.toFixed(2)}
 						</div>
 					</div>
-					<div className=" text-gray-700 dark:text-gray-300">
+					<div className="text-gray-700 dark:text-gray-300">
 						<div className="flex gap-x-2">
 							<Target size={20} />
 							Goals Completed:
@@ -206,35 +207,39 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 						</div>
 					</div>
 				</div>
-
 				{/* Chart */}
-				<div className="md:w-full h-[50svh] md:h-full bg-white dark:bg-[#2a2a2d] rounded-xl shadow md:p-4 flex justify-center items-center">
-					<ResponsiveContainer>
-						<PieChart margin={{ top: 10, right: 45, bottom: 10, left: 0 }}>
-							<Pie
-								data={chartData}
-								cx="50%"
-								cy="50%"
-								innerRadius={30}
-								outerRadius={90}
-								paddingAngle={2}
-								fill="#8884d8"
-								dataKey="value"
-							>
-								{chartData.map((entry, index) => (
+				<div className="h-[320px] w-full bg-white dark:bg-[#2a2a2d] rounded-xl shadow flex justify-center items-center text-black">
+					<ResponsiveContainer width="100%" height="100%">
+						<BarChart
+							data={chartData}
+							margin={{ top: 30, right: 30, left: 0, bottom: 0 }}
+						>
+							<CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
+							<XAxis
+								dataKey="name"
+								angle={-15}
+								textAnchor="end"
+								interval={0}
+								height={60}
+								tick={{ fontSize: 14 }}
+							/>
+							<YAxis tick={{ fontSize: 12 }} />
+							<Tooltip />
+							<Bar dataKey="value" radius={[4, 4, 0, 0]}>
+								{chartData.map((_, index) => (
 									<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
 								))}
-							</Pie>
-							<Tooltip />
-							<Legend verticalAlign="bottom" height={40} />
-						</PieChart>
+							</Bar>
+						</BarChart>
 					</ResponsiveContainer>
 				</div>
 			</div>
-
 			{/* Active Goals */}
 			<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6">
 				<div className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Active Goals</div>
+				{activeGoals.length === 0 ? (
+					<EmptyMiniState message="goals" />
+				) : (
 				<div className="space-y-4">
 					{activeGoals.map((goal) => {
 						const progress = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
@@ -255,7 +260,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 										</span>
 										{overdue && (
 											<span className="flex items-center gap-1 text-xs text-[#ef4444] font-medium">
-												<AlertTriangle size={12} /> Overdue
+										 		<AlertTriangle size={12} /> Overdue
 											</span>
 										)}
 									</div>
@@ -335,18 +340,19 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 								</div>
 								{nearComplete && (
 									<div className="mt-2 text-xs text-green-600 flex items-center gap-1">
-										<CheckCircle size={12} /> You’re almost there! 🎉
+										<CheckCircle size={12} /> You're almost there!
 									</div>
 								)}
 							</div>
 						);
 					})}
 				</div>
+			)}
 			</div>
 			{/* Completed Goals */}
 			{completedGoals.length > 0 && (
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6 mb-4">
-					<h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Completed Goals</h3>
+					<div className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Completed Goals</div>
 					{completedGoals.map((goal) => (
 						<div
 							key={goal.id}
@@ -356,7 +362,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 								<CheckCircle className="text-[#22c55e]" size={16} />
 								<span>{goal.name}</span>
 							</div>
-							<span className="text-gray-500">${goal.target}</span>
+							<div className="text-gray-500">${goal.target}</div>
 						</div>
 					))}
 				</div>

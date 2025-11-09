@@ -4,6 +4,7 @@ import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
 import ExpensesChartCard from "./ExpensesChartCard";
 import { format, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
+import { EmptyMiniState } from "emptyStates/EmptyMiniState";
 
 type Transaction = {
 	id: string;
@@ -169,7 +170,9 @@ export default function ExpensesContent() {
 	}, [dateRange, totalSpending, byCategory, filtered]);
 
 	const sideItems = useMemo(() => {
-		return [...filtered].sort((a, b) => b.amount - a.amount);
+		return [...filtered]
+			.filter((t) => t.amount > 0) // 🔥 hides zero-applied transactions
+			.sort((a, b) => b.amount - a.amount);
 	}, [filtered]);
 
 	const chartData = byCategory.map((c, i) => ({
@@ -229,7 +232,7 @@ export default function ExpensesContent() {
 							</button>
 						</div>
 					</div>
-					<div className="flex items-center gap-3">
+					<div className="flex flex-wrap justify-start items-start gap-3">
 						<select
 							value={rangePreset}
 							onChange={(e) => setRangePreset(e.target.value as any)}
@@ -242,7 +245,7 @@ export default function ExpensesContent() {
 							<option value="custom">Custom</option>
 						</select>
 						{rangePreset === "custom" && (
-							<div className="flex items-center gap-2">
+							<div className="flex flex-wrap items-center gap-2">
 								<input
 									type="date"
 									value={customFrom}
@@ -261,7 +264,7 @@ export default function ExpensesContent() {
 					</div>
 				</div>
 				{/* MAIN CONTENT */}
-				<div className="p-6 h-full flex flex-col gap-y-10 overflow-auto">
+				<div className="md:p-6 h-full flex flex-col gap-y-10 overflow-auto">
 					<ExpensesChartCard
 						totalSpending={totalSpending}
 						filteredCount={filtered.length}
@@ -270,7 +273,7 @@ export default function ExpensesContent() {
 						chartData={chartData}
 					/>
 					{/* Stats */}
-					<div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+					<div className="mb-8 md:mb-0 p-4 md:p-0 grid grid-cols-1 md:grid-cols-4 gap-4">
 						<div className="bg-white dark:bg-[#1c1c1e] rounded-lg shadow p-4 border border-gray-300 dark:border-gray-700">
 							<div className="text-sm text-muted-foreground">
 								Average Monthly
@@ -323,12 +326,17 @@ export default function ExpensesContent() {
 			<div className="w-full md:w-[35vw] h-fit md:h-[90svh] md:border-l border-gray-300 dark:border-gray-700 pb-[10svh] md:pb-0">
 				<div className="bg-white dark:bg-[#1c1c1e] p-4 h-full flex flex-col">
 					<div className="text-lg font-bold mb-3">Transactions</div>
+					<div className="text-sm text-gray-500">
+						Most spent at top
+					</div>
 					<div className="text-sm text-gray-500 mb-3">
-						Most spent at top — filtered by selected range/categories
+						filtered by selected range/categories
 					</div>
 					<div className="flex-1 overflow-y-auto space-y-3">
 						{sideItems.length === 0 && (
-							<div className="text-sm text-gray-500">No transactions</div>
+							<div className="h-full flex justify-center items-center">
+								<EmptyMiniState message="transactions" />
+							</div>
 						)}
 						{sideItems.map((t) => (
 							<div

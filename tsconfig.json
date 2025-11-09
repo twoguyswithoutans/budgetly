@@ -26,6 +26,7 @@
       "expenses/*": ["./src/components/expenses/*"],
       "goals/*": ["./src/components/goals/*"],
       "overview/*": ["./src/components/overview/*"],
+      "emptyStates/*": ["./src/components/emptyStates/*"],
       "Loader": ["./src/components/loader/Loader.tsx"],
     }
   },
