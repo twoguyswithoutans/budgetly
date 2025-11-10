@@ -1,6 +1,6 @@
 'use client';
 import { useRouter, usePathname } from 'next/navigation'
-import ThemeToggle from "@theme/ThemeToggle";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import { BanknoteArrowDown, LayoutDashboard, Milestone, SquareKanban } from "lucide-react";
 
 export default function Navbar() {
