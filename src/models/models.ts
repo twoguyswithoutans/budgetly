@@ -47,6 +47,11 @@ export interface EmptyStateProps {
     message?: string;
     graph?: boolean;
 }
+export interface NavItem {
+	name: string;
+	path: string;
+	icon: React.ComponentType<{ size?: string | number }>;
+}
 export interface HeaderProps {
 	triggerRefresh?: number;
 	onMonthChange?: (month: Date) => void;
