@@ -78,7 +78,7 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 	};
 
 	return (
-		<div className="absolute top-0 bg-background py-5 px-5 md:py-5 w-screen md:w-full h-full shadow-md flex flex-col gap-6 z-50 overflow-auto ">
+		<div className="absolute top-0 bg-background py-5 px-5 lg:py-5 w-screen lg:w-full h-full shadow-md flex flex-col gap-6 z-50 overflow-auto ">
 			<div className="flex justify-between items-center">
 				<div className="text-xl font-bold">{item?.title}</div>
 				<button
@@ -88,7 +88,7 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 				</button>
 			</div>
 			<div>
-				<div className="w-full h-fit flex flex-col gap-y-3 bg-white dark:bg-[rgb(28,28,30)] rounded-lg p-5">
+				<div className="w-full h-[80svh] max-h-fit md:h-fit flex flex-col gap-y-3 bg-white dark:bg-[rgb(28,28,30)] rounded-lg p-5 overflow-auto">
 					<div className="text-sm font-semibold pb-3 text-gray-800 dark:text-gray-200 border-b border-background">
 						Add / Change Detail
 					</div>

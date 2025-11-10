@@ -184,20 +184,20 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 
 	if(loading) {
 		return (
-			<div className="flex justify-center items-center h-[65svh] md:h-[80svh]">
+			<div className="flex justify-center items-center h-[65svh] md:h-[70svh] lg:h-[80svh]">
 				<Loader title="Dashboard" />
 			</div>
 		)
 	}
 
 	return (
-		<div className="flex flex-col md:flex-row w-full">
-			<div className="w-screen md:w-[55vw] flex flex-col bg-white dark:bg-[#1c1c1e] text-foreground overflow-hidden border-r border-gray-300 dark:border-gray-700">
+		<div className="flex flex-col lg:flex-row w-full">
+			<div className="w-screen lg:w-[55vw] flex flex-col bg-white dark:bg-[#1c1c1e] text-foreground overflow-hidden border-r border-gray-300 dark:border-gray-700">
 				<div className="w-full h-[10svh] z-40">
 					<DashboardToolbar />
 					<DashboardTitleBar />
 				</div>
-				<div className="w-full h-[65svh] md:h-[80svh] flex flex-col gap-x-10">
+				<div className="w-full h-[65svh] md:h-[70svh] lg:h-[80svh] flex flex-col gap-x-10">
 					<div className="h-full overflow-auto">
 						{/* Categories */}
 						{categories?.map((category) => {
@@ -278,7 +278,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				</div>
 			</div>
 			{/* Side panel */}
-			<div className="md:relative md:w-[25vw]">
+			<div className="lg:relative lg:w-[25vw]">
 				{selectedItem ? (
 					<ContentSidePanel
 						item={selectedItem}
@@ -287,7 +287,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 						onDelete={handleItemDelete}
 					/>
 				) : (
-					<div className="hidden px-6 md:h-full md:flex items-center justify-center text-gray-400">
+					<div className="hidden px-6 lg:h-full lg:flex items-center justify-center text-gray-400">
 						Select an item to view or edit.
 					</div>
 				)}

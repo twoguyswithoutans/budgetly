@@ -44,15 +44,15 @@ export default function Navbar() {
 	return (
 		<>
 			{/* Bottom Nav (Mobile) */}
-			<nav className="fixed bottom-0 left-0 w-full h-[10svh] bg-[#1d3c60] z-50 flex justify-around items-center pb-[env(safe-area-inset-bottom)] md:hidden">
+			<nav className="fixed bottom-0 left-0 w-full h-[10svh] bg-[#1d3c60] z-50 flex justify-around items-center pb-[env(safe-area-inset-bottom)] lg:hidden">
 				{navItems.map((item) => renderNavButton(item, true))}
-				<div className="mr-3">
+				<div className="mr-4 md:mr-10">
 					<ThemeToggle />
 				</div>
 			</nav>
 
 			{/* Side Nav (Desktop) */}
-			<aside className="hidden md:flex flex-col w-[20vw] h-screen bg-[#1d3c60] text-white p-6">
+			<aside className="hidden lg:flex flex-col w-[20vw] h-screen bg-[#1d3c60] text-white p-6">
 				<h1 className="text-2xl font-extrabold mb-10">Budgetly</h1>
 
 				<div className="flex flex-col gap-2">

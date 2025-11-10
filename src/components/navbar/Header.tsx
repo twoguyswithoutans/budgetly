@@ -117,7 +117,7 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 	return (
 		<div className="fixed top-0 w-full flex flex-col bg-white dark:bg-[#1c1c1e] border-b border-gray-300 dark:border-gray-700 z-50">
 
-			<div className="w-screen md:w-[80vw] h-[10svh] border-b border-gray-300 dark:border-gray-700 flex justify-between items-center px-6">
+			<div className="w-screen lg:w-[80vw] h-[10svh] border-b border-gray-300 dark:border-gray-700 flex justify-between items-center px-6">
 				<div>
 					<div className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200">{title}</div>
 				</div>
