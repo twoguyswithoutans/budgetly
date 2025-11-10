@@ -20,6 +20,7 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
+      "@theme/*": ["./src/components/theme/*"],
       "@navbar/*": ["./src/components/navbar/*"],
       "@dashboard/*": ["./src/components/dashboard/*"],
       "@expenses/*": ["./src/components/expenses/*"],

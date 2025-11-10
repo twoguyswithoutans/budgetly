@@ -162,7 +162,7 @@ export default function Overview() {
 		setShowAI(true);
 
 		try {
-			const res = await fetch("/api/ai-insights", {
+			const res = await fetch("@/app/api/ai-insights", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ summary, spendingData, goals, dateRange }),
