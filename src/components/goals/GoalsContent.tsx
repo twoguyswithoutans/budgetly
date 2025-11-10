@@ -1,28 +1,22 @@
 import { useState, useEffect, useMemo } from "react";
-import Loader from "Loader";
+import { Goal, GoalsContentProp } from "@models";
 import { supabase } from "@/lib/supabaseClient";
-import { EmptyMiniState } from "emptyStates/EmptyMiniState";
+import { EmptyState } from "@emptyStates/EmptyState";
+import { useToast } from "@useToast";
+import Loader from "@Loader";
 import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, Tooltip, ResponsiveContainer } from "recharts";
 import { Scroll, Edit, Trash2, CheckCircle, AlertTriangle, Wallet, CreditCard, Target } from "lucide-react";
 
-type Goal = {
-	id: string;
-	type: "saving" | "debt";
-	name: string;
-	target: number;
-	current: number;
-	due: string;
-};
-
-interface GoalsContentTriggerRefreshProp {
-	onTriggerRefresh: () => void;
-}
-
-export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContentTriggerRefreshProp>) {
+export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContentProp>) {
 	const [loading, setLoading] = useState(true);
 	const [goals, setGoals] = useState<Goal[]>([]);
 	const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
 	const [addAmount, setAddAmount] = useState("");
+	const completedGoals = goals.filter((g) => g.current >= g.target);
+	const activeGoals = goals.filter((g) => g.current < g.target);
+	const today = new Date();
+	const COLORS = ["#22c55e", "#ef4444"];
+	const { showToast } = useToast();
 
 	useEffect(() => {
 		const fetchGoals = async () => {
@@ -34,6 +28,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 
 			if (error) {
 				console.error("Error fetching goals:", error);
+				showToast("Error fetching goals!", "error")
 				setGoals([]);
 				setLoading(false);
 				return;
@@ -69,25 +64,30 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			.update({ appliedAmount: newCurrent })
 			.eq("id", id);
 
-		if (error) {
-			console.error("Error updating progress:", error);
+		if(error) {
+			console.error("Error updating progress:", error)
+			showToast("Error updating progress!", "error")
 			return;
 		}
-
 		setGoals((prev) =>
 			prev.map((g) => (g.id === id ? { ...g, current: newCurrent } : g))
-		);
+		)
+		if(newCurrent >= goal.target) {
+			showToast("Goal completed!", "info")
+		}
 		onTriggerRefresh();
 	};
 
 	const handleDelete = async (id: string) => {
 		const { error } = await supabase.from("items").delete().eq("id", id);
 		if (error) {
-			console.error("Error deleting goal/item:", error);
+			console.error("Error deleting goal:", error)
+			showToast("Error deleting goal!", "error")
 			return;
 		}
 		setGoals((prev) => prev.filter((g) => g.id !== id));
 		onTriggerRefresh();
+		showToast("Goal deleted!", "success")
 	};
 
 	const handleAddAmount = async () => {
@@ -103,6 +103,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 
 		if(error) {
 			console.error("Error updating goal amount:", error);
+			showToast("Error updating goal amount!", "error")
 			return;
 		}
 
@@ -110,7 +111,11 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			prev.map((g) =>
 				g.id === editingGoal.id ? { ...g, current: newCurrent } : g
 			)
-		);
+		)
+
+		if(newCurrent >= editingGoal.target) {
+			showToast("Goal completed!", "info")
+		}
 		setAddAmount("");
 		setEditingGoal(null);
 		onTriggerRefresh();
@@ -148,13 +153,6 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 		{ name: "Savings", value: totalSavings },
 		{ name: "Debts", value: totalDebts },
 	];
-
-	const COLORS = ["#22c55e", "#ef4444"];
-
-	const completedGoals = goals.filter((g) => g.current >= g.target);
-	const activeGoals = goals.filter((g) => g.current < g.target);
-
-	const today = new Date();
 
 	if(loading) {
 		return (
@@ -237,117 +235,118 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			{/* Active Goals */}
 			<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6">
 				<div className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-4">Active Goals</div>
-				{activeGoals.length === 0 ? (
-					<EmptyMiniState message="goals" />
-				) : (
-				<div className="space-y-4">
-					{activeGoals.map((goal) => {
-						const progress = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
-						const due = goal.due ? new Date(goal.due) : null;
-						const overdue = !!due && due < today && goal.type === "debt";
-						const nearComplete = progress >= 80 && progress < 100;
+				{activeGoals.length > 0 ? (
+					<div className="space-y-4">
+						{activeGoals.map((goal) => {
+							const progress = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
+							const due = goal.due ? new Date(goal.due) : null;
+							const overdue = !!due && due < today && goal.type === "debt";
+							const nearComplete = progress >= 80 && progress < 100;
 
-						return (
-							<div key={goal.id} className="border-b border-gray-300 dark:border-gray-700 pb-3">
-								<div className="flex justify-between items-center mb-2">
-									<div className="flex items-center gap-2">
-										<span
-											className={`text-sm font-semibold ${
-												goal.type === "saving" ? "text-[#1c9247]" : "text-[#d33d3d]"
-											}`}
-										>
-											{goal.name}
-										</span>
-										{overdue && (
-											<span className="flex items-center gap-1 text-xs text-[#ef4444] font-medium">
-										 		<AlertTriangle size={12} /> Overdue
+							return (
+								<div key={goal.id} className="border-b border-gray-300 dark:border-gray-700 pb-3">
+									<div className="flex justify-between items-center mb-2">
+										<div className="flex items-center gap-2">
+											<span
+												className={`text-sm font-semibold ${
+													goal.type === "saving" ? "text-[#1c9247]" : "text-[#d33d3d]"
+												}`}
+											>
+												{goal.name}
 											</span>
-										)}
+											{overdue && (
+												<span className="flex items-center gap-1 text-xs text-[#ef4444] font-medium">
+													<AlertTriangle size={12} /> Overdue
+												</span>
+											)}
+										</div>
+										<div className="text-sm text-gray-600 dark:text-gray-400">
+											${goal.current} / ${goal.target}
+										</div>
 									</div>
-									<div className="text-sm text-gray-600 dark:text-gray-400">
-										${goal.current} / ${goal.target}
+									<div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+										<div
+											className={`h-full rounded-full transition-all duration-500 ${
+												goal.type === "saving" ? "bg-[#22c55e]" : "bg-[#ef4444]"
+											}`}
+											style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
+										/>
 									</div>
-								</div>
-								<div className="w-full h-3 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
-									<div
-										className={`h-full rounded-full transition-all duration-500 ${
-											goal.type === "saving" ? "bg-[#22c55e]" : "bg-[#ef4444]"
-										}`}
-										style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
-									/>
-								</div>
-								<div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
-									<span>Due: {goal.due || "—"}</span>
-									<div className="flex gap-2">
-										<button
-											onClick={() => handleAddProgress(goal.id, 100)}
-											className="text-blue-500 hover:underline"
-										>
-											+ Add $100
-										</button>
-										<button
-											onClick={() => setEditingGoal(goal)}
-											className="text-gray-500 hover:text-gray-700"
-										>
-											<Edit size={14} />
-										</button>
-										{editingGoal?.id === goal.id && (
-											<div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
-												<div className="bg-white dark:bg-[rgb(28,28,30)] p-6 rounded-xl w-80 shadow-lg">
-													<h3 className="text-lg font-bold mb-4">Add Amount</h3>
+									<div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+										<span>Due: {goal.due || "—"}</span>
+										<div className="flex gap-2">
+											<button
+												onClick={() => handleAddProgress(goal.id, 100)}
+												className="text-blue-500 hover:underline"
+											>
+												+ Add $100
+											</button>
+											<button
+												onClick={() => setEditingGoal(goal)}
+												className="text-gray-500 hover:text-gray-700"
+											>
+												<Edit size={14} />
+											</button>
+											{editingGoal?.id === goal.id && (
+												<div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
+													<div className="bg-white dark:bg-[rgb(28,28,30)] p-6 rounded-xl w-80 shadow-lg">
+														<h3 className="text-lg font-bold mb-4">Add Amount</h3>
 
-													<div className="flex flex-col gap-3">
-														<p className="text-sm font-medium">
-															{editingGoal.name} ({editingGoal.type === "saving" ? "Saving" : "Debt"})
-														</p>
-														<label htmlFor="addAmount" className="text-sm font-semibold">Amount to Add</label>
-														<input
-															name="addAmount"
-															type="number"
-															value={addAmount}
-															onChange={(e) => setAddAmount(e.target.value)}
-															placeholder="Enter amount"
-															className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
-														/>
-														<div className="flex justify-end gap-3 mt-4">
-															<button
-																onClick={() => {
-																	setAddAmount("");
-																	setEditingGoal(null);
-																}}
-																className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
-															>
-																Cancel
-															</button>
-															<button
-																onClick={handleAddAmount}
-																className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
-															>
-																Add
-															</button>
+														<div className="flex flex-col gap-3">
+															<p className="text-sm font-medium">
+																{editingGoal.name} ({editingGoal.type === "saving" ? "Saving" : "Debt"})
+															</p>
+															<label htmlFor="addAmount" className="text-sm font-semibold">Amount to Add</label>
+															<input
+																name="addAmount"
+																type="number"
+																value={addAmount}
+																onChange={(e) => setAddAmount(e.target.value)}
+																placeholder="Enter amount"
+																className="border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
+															/>
+															<div className="flex justify-end gap-3 mt-4">
+																<button
+																	onClick={() => {
+																		setAddAmount("");
+																		setEditingGoal(null);
+																	}}
+																	className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
+																>
+																	Cancel
+																</button>
+																<button
+																	onClick={handleAddAmount}
+																	className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
+																>
+																	Add
+																</button>
+															</div>
 														</div>
 													</div>
 												</div>
-											</div>
-										)}
-										<button
-											onClick={() => handleDelete(goal.id)}
-											className="text-[#ef4444] hover:text-[#c93a3a]"
-										>
-											<Trash2 size={14} />
-										</button>
+											)}
+											<button
+												onClick={() => handleDelete(goal.id)}
+												className="text-[#ef4444] hover:text-[#c93a3a]"
+											>
+												<Trash2 size={14} />
+											</button>
+										</div>
 									</div>
+									{nearComplete && (
+										<div className="mt-2 text-xs text-green-600 flex items-center gap-1">
+											<CheckCircle size={12} /> You're almost there!
+										</div>
+									)}
 								</div>
-								{nearComplete && (
-									<div className="mt-2 text-xs text-green-600 flex items-center gap-1">
-										<CheckCircle size={12} /> You're almost there!
-									</div>
-								)}
-							</div>
-						);
-					})}
-				</div>
-			)}
+							);
+						})}
+					</div>
+				):
+				(
+					<EmptyState message="goals" graph={false} />
+				)}
 			</div>
 			{/* Completed Goals */}
 			{completedGoals.length > 0 && (

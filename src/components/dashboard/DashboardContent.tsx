@@ -1,35 +1,18 @@
-import { useState, useRef, useEffect } from "react";
-import Loader from "Loader";
+import { useCallback, useState, useRef, useEffect } from "react";
+import { Category, Item, DashboardContentProp } from "@models";
 import { supabase } from "@/lib/supabaseClient";
-import { ChevronDown, ChevronRight, CirclePlus, Undo, Redo, History } from "lucide-react";
-import DashboardToolbar from "dashboard/DashboardToolbar";
-import DashboardTitleBar from "dashboard/DashboardTitleBar";
+import { useToast } from "@useToast";
+import Loader from "@Loader";
+import DashboardToolbar from "@dashboard/DashboardToolbar";
+import DashboardTitleBar from "@dashboard/DashboardTitleBar";
 import ContentSidePanel from "./ContentSidePanel";
+import AddItemPopup from "./AddItemPopup";
+import CategoryItems from "./CategoryItems";
+import CategoryTotals from "./CategoryTotals";
 import { format } from "date-fns";
+import { ChevronDown, ChevronRight, CirclePlus } from "lucide-react";
 
-interface Item {
-	id: string;
-	title: string;
-	total: number;
-	appliedAmount: number;
-	dateAdded: string;
-	repeatMonthly: boolean;
-	dueDate: string | null;
-	category_id: string;
-}
-
-interface Category {
-	id: string;
-	name: string;
-	items: Item[];
-}
-
-interface DashboardContentTriggerRefreshProp {
-	onTriggerRefresh: () => void;
-	currentMonth: Date;
-}
-
-export default function DashboardContent({ onTriggerRefresh, currentMonth }: Readonly<DashboardContentTriggerRefreshProp>) {
+export default function DashboardContent({ onTriggerRefresh, currentMonth }: Readonly<DashboardContentProp>) {
 	const [loading, setLoading] = useState(true);
 	const [openCategories, setOpenCategories] = useState<string[]>([]);
 	const [openPopup, setOpenPopup] = useState<string | null>(null);
@@ -38,6 +21,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [selectedItem, setSelectedItem] = useState<Item | undefined>();
 	const currentDate = format(new Date(), "yyyy-MM-dd");
+	const { showToast } = useToast();
 
 	useEffect(() => {
 		async function fetchCategories() {
@@ -55,14 +39,14 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				setLoading(false);
 			}
 			else {
-				const filtered = data.map((cat: any) => ({
-					...cat,
-					items: cat.items.filter((i: any) => i.dateAdded >= start && i.dateAdded <= end),
+				const filtered = data.map((category: any) => ({
+					...category,
+					items: category.items.filter((i: any) => i.dateAdded >= start && i.dateAdded <= end),
 				}));
 				setCategories(filtered);
 				const autoOpen = filtered
-				.filter((cat: any) => cat.items.length > 0)
-				.map((cat: any) => cat.name);
+				.filter((category: any) => category.items.length > 0)
+				.map((category: any) => category.name);
 				setOpenCategories(autoOpen);
 			}
 			setLoading(false);
@@ -91,29 +75,31 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 					repeatMonthly: false,
 					dueDate: null,
 					category_id: categoryId,
-					dateAdded: currentDate,
-				},
+					dateAdded: currentDate
+				}
 			])
 			.select();
 
 		if (error) {
-			console.error("Error adding item:", error);
-		} else {
+			console.error("Error adding item:", error)
+			showToast("Error adding item!", "error")
+		}
+		else {
 			setCategories((prev) =>
 				prev.map((category) =>
 					category.id === categoryId
 						? { ...category, items: [...category.items, data[0]] }
 						: category
 				)
-			);
-			onTriggerRefresh();
+			)
+			onTriggerRefresh()
+			showToast("Item added!", "info")
 		}
-
-		setOpenPopup(null);
-		setNewItemName("");
+		setOpenPopup(null)
+		setNewItemName("")
 	}
 
-	function handleSelectedItem(item: Item) {
+	const handleSelectedItem = useCallback((item: Item) => {
 		setSelectedItem({
 			category_id: item.category_id,
 			id: item.id,
@@ -123,22 +109,25 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 			dateAdded: item.dateAdded,
 			repeatMonthly: item.repeatMonthly,
 			dueDate: item.dueDate,
-		});
-	}
+		})
+	}, []);
 
 	const handleItemDelete = async (id: string) => {
 		const { error } = await supabase.from("items").delete().eq("id", id);
 		if (error) {
 			console.error("Delete failed:", error);
-		} else {
+			showToast("Delete failed!", "error")
+		}
+		else {
 			setCategories((prev) =>
-				prev.map((cat) => ({
-					...cat,
-					items: cat.items.filter((i) => i.id !== id),
+				prev.map((category) => ({
+					...category,
+					items: category.items.filter((i) => i.id !== id),
 				}))
 			);
 			setSelectedItem(undefined);
 			onTriggerRefresh();
+			showToast("Deleted successfully!", "success")
 		}
 	};
 
@@ -163,9 +152,9 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 		}
 
 		setCategories((prev) =>
-			prev.map((cat) => ({
-				...cat,
-				items: cat.items.map((i) =>
+			prev.map((category) => ({
+				...category,
+				items: category.items.map((i) =>
 					i.id === updatedItem.id ? { ...i, ...updatedItem } : i
 				),
 			}))
@@ -176,12 +165,22 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 		setSelectedItem(undefined)
 	};
 
-	const localizeNumber = (number: number) => {
-		return number.toLocaleString("en-US", {
-			minimumFractionDigits: 0,
-			maximumFractionDigits: 2,
-		});
+	const localizeNumber = useCallback((number: number) => 
+		`$${number.toLocaleString("en-US", { minimumFractionDigits: 0, maximumFractionDigits: 2 })}`,
+	[]);
+
+	const getCategoryTotals = (category: Category) => {
+		return category.items.reduce(
+			(acc, item) => {
+				acc.applied += item.appliedAmount;
+				acc.total += item.total;
+				acc.due += item.total - item.appliedAmount;
+				return acc;
+			},
+			{ applied: 0, total: 0, due: 0 }
+		);
 	};
+
 
 	if(loading) {
 		return (
@@ -201,24 +200,26 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 				<div className="w-full h-[65svh] md:h-[80svh] flex flex-col gap-x-10">
 					<div className="h-full overflow-auto">
 						{/* Categories */}
-						{categories?.map((cat) => {
-							const isOpen = openCategories.includes(cat.name);
-							const isPopupOpen = openPopup === cat.name;
-
-							return (
-								<div key={cat.name}>
+						{categories?.map((category) => {
+							const isOpen = openCategories.includes(category.name);
+							const isPopupOpen = openPopup === category.name;
+							return(
+								<div key={category.name}>
 									{/* Category Header */}
 									<div className="relative">
-										<div className="flex items-center justify-between px-6 py-3 bg-background hover:bg-secondary border-b border-gray-300 dark:border-gray-700">
+										<div className="flex items-center justify-between px-8 py-3 bg-background hover:bg-secondary border-b border-gray-300 dark:border-gray-700">
 											<div className="flex-[2] flex items-center gap-x-3 font-bold relative">
 												<button
 													onClick={() => {
 														if(isOpen) {
 															setOpenCategories(
-																openCategories.filter((c) => c !== cat.name)
-															);
-														} else {
-															setOpenCategories([...openCategories, cat.name]);
+																openCategories.filter((c) => c !== category.name)
+															)
+														}
+														else {
+															setOpenCategories(
+																[...openCategories, category.name]
+															)
 														}
 													}}
 												>
@@ -234,10 +235,10 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 														/>
 													)}
 												</button>
-												<div>{cat.name}</div>
+												<div>{category.name}</div>
 												<button
 													onClick={() => {
-														setOpenPopup(isPopupOpen ? null : cat.name);
+														setOpenPopup(isPopupOpen ? null : category.name);
 														setNewItemName("");
 													}}
 												>
@@ -245,77 +246,30 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 												</button>
 											</div>
 
-											<div className="text-right flex-1 font-semibold">$0.00</div>
-											<div className="text-right flex-1 font-semibold">$0.00</div>
-											<div className="text-right flex-1 font-semibold">$0.00</div>
+											<CategoryTotals
+												category={category}
+												getCategoryTotals={getCategoryTotals}
+												localizeNumber={localizeNumber}
+											/>
 										</div>
+										{/* Add Item Popup */}
 										{isPopupOpen && (
-											<div
+											<AddItemPopup
 												ref={popupRef}
-												className="absolute top-full left-10 w-[50vw] md:w-[15vw] bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-xl shadow-lg p-4 z-20"
-											>
-												<div className="font-semibold mb-2 text-gray-800 dark:text-gray-200">
-													Add Item
-												</div>
-												<input
-													type="text"
-													placeholder="Enter Item Name"
-													value={newItemName}
-													onChange={(e) => setNewItemName(e.target.value)}
-													className="w-full border border-gray-300 dark:border-gray-700 rounded-lg px-3 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-[#2a2a2d] dark:text-white"
-												/>
-												<div className="flex justify-end gap-2">
-													<button
-														onClick={() => setOpenPopup(null)}
-														className="px-3 py-1.5 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
-													>
-														Cancel
-													</button>
-													<button
-														onClick={() => handleAssign(cat.id)}
-														className="px-3 py-1.5 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
-													>
-														Add
-													</button>
-												</div>
-											</div>
+												newItemName={newItemName}
+												setNewItemName={setNewItemName}
+												onCancel={() => setOpenPopup(null)}
+												onAdd={() => handleAssign(category.id)}
+											/>
 										)}
 									</div>
-									{/* Items */}
+									{/* Category Items */}
 									{isOpen && (
-										<div className="bg-white dark:bg-[#1c1c1e] group">
-											{cat.items.map((item) => (
-												<button
-													key={item.id}
-													onClick={() => handleSelectedItem(item)}
-													className="w-full h-fit flex justify-between items-center px-8 py-2 text-sm border-b border-gray-300 dark:border-gray-700 hover:bg-[#dee6ff] dark:hover:bg-[#5d616b] active:bg-[#c6d3fd]"
-												>
-													<div className="flex-[2] truncate flex items-center gap-x-2">
-														{item.title}
-													</div>
-													<div className="flex-1 text-right">
-														$
-														{item.appliedAmount.toLocaleString("en-US", {
-															minimumFractionDigits: 0,
-															maximumFractionDigits: 2,
-														})}
-													</div>
-													<div className="flex-1 text-right">
-														$
-														{localizeNumber(item.total)}
-													</div>
-													<div className="flex-1 text-right">
-														$
-														{(
-															item.total - item.appliedAmount
-														).toLocaleString("en-US", {
-															minimumFractionDigits: 0,
-															maximumFractionDigits: 2,
-														})}
-													</div>
-												</button>
-											))}
-										</div>
+										<CategoryItems
+											items={category.items}
+											handleSelectedItem={handleSelectedItem}
+											localizeNumber={localizeNumber}
+										/>
 									)}
 								</div>
 							);
@@ -333,7 +287,7 @@ export default function DashboardContent({ onTriggerRefresh, currentMonth }: Rea
 						onDelete={handleItemDelete}
 					/>
 				) : (
-					<div className="hidden md:h-full md:flex items-center justify-center text-gray-400">
+					<div className="hidden px-6 md:h-full md:flex items-center justify-center text-gray-400">
 						Select an item to view or edit.
 					</div>
 				)}

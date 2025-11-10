@@ -1,18 +1,14 @@
 "use client";
 import { useState, useEffect } from "react";
-import Loader from "Loader";
 import { supabase } from "@/lib/supabaseClient";
-import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, ResponsiveContainer, Tooltip, Legend, LineChart, Line, } from "recharts";
-import { useRouter } from "next/navigation";
-import { startOfMonth, endOfMonth, subMonths, format, parseISO, isAfter, isBefore } from "date-fns";
+import { EmptyState } from "@emptyStates/EmptyState";
+import Loader from "@Loader";
 import ActiveGoals from "./ActiveGoalsCard";
-import { EmptyGraphState } from "emptyStates/EmptyGraphState";
-
-const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
+import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { startOfMonth, endOfMonth, subMonths, format, parseISO, isAfter, isBefore } from "date-fns";
 
 export default function Overview() {
 	const [loading, setLoading] = useState(true);
-	const router = useRouter();
 	const [showAI, setShowAI] = useState(false);
 	const [filter, setFilter] = useState("This Month");
 	const [dateRange, setDateRange] = useState({
@@ -26,6 +22,7 @@ export default function Overview() {
 	const [aiLoading, setAiLoading] = useState(false);
 	const [aiText, setAiText] = useState<string>("");
 	const [aiError, setAiError] = useState<string | null>(null);
+	const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 	useEffect(() => {
 		const today = new Date();
@@ -34,13 +31,15 @@ export default function Overview() {
 				from: format(startOfMonth(today), "yyyy-MM-dd"),
 				to: format(endOfMonth(today), "yyyy-MM-dd"),
 			});
-		} else if (filter === "Last Month") {
+		}
+		else if (filter === "Last Month") {
 			const lastMonth = subMonths(today, 1);
 			setDateRange({
 				from: format(startOfMonth(lastMonth), "yyyy-MM-dd"),
 				to: format(endOfMonth(lastMonth), "yyyy-MM-dd"),
 			});
-		} else if (filter === "Last 3 Months") {
+		}
+		else if (filter === "Last 3 Months") {
 			const threeMonthsAgo = subMonths(today, 2);
 			setDateRange({
 				from: format(startOfMonth(threeMonthsAgo), "yyyy-MM-dd"),
@@ -279,7 +278,7 @@ export default function Overview() {
 							</BarChart>
 						</ResponsiveContainer>
 						) : (
-							<EmptyGraphState message="spending" />
+							<EmptyState message="spending" graph={true} />
 						)}
 					</div>
 				</div>
@@ -302,7 +301,7 @@ export default function Overview() {
 								</BarChart>
 							</ResponsiveContainer>
 						) : (
-							<EmptyGraphState message="income or expense" />
+							<EmptyState message="income or expense" graph={true} />
 						)}
 					</div>
 				</div>

@@ -1,5 +1,5 @@
-import Header from "navbar/Header";
-import ExpensesContent from "expenses/ExpensesContent";
+import Header from "@navbar/Header";
+import ExpensesContent from "@expenses/ExpensesContent";
 
 export default function Page() {
 	return (

@@ -1,23 +1,9 @@
-import { supabase } from '@/lib/supabaseClient';
 import { useState, useEffect } from "react";
-import { HandCoins, Save, Trash, X } from "lucide-react";
+import { ContentSidePanelProps } from "@models";
+import { supabase } from '@/lib/supabaseClient';
+import { useToast } from "@useToast";
 import { format } from "date-fns";
-
-interface ContentSidePanelProps {
-	item?: {
-		id: string;
-		category_id: string;
-		title: string;
-		total: number;
-		appliedAmount: number;
-		dateAdded: string;
-		repeatMonthly: boolean;
-		dueDate?: string | null;
-	};
-	onSave: (updatedItem?: any) => void;
-	onDelete: ((id: string) => void );
-	onClose: () => void;
-}
+import { HandCoins, Save, Trash, X } from "lucide-react";
 
 function safeAdd(a: unknown, b: unknown): number {
 	const numA = Number(a);
@@ -38,6 +24,7 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 	const currentDate = format(new Date(), "yyyy-MM-dd");
 	const [editable, setEditable] = useState(item);
 	const [addAmount, setAddAmount] = useState<number | null>(null);
+	const { showToast } = useToast();
 
 	useEffect(() => {
 		setEditable(item);
@@ -58,7 +45,7 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 		const newApplied = safeAdd(editable.appliedAmount, addAmount);
 
 		if (newApplied > editable.total) {
-			// alert("Applied amount cannot be greater than total!");
+			showToast("Applied amount cannot be greater than total!", "error")
 			return;
 		}
 
@@ -75,13 +62,13 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 
 		if (error) {
 			console.error(error);
-			// alert("Failed to save item!");
+			showToast("Failed to save iteme!", "error")
 			return;
 		}
 
 		onSave(updatedItem);
 		setAddAmount(0)
-		// alert("Item updated successfully!");
+		showToast("Saved successfully!", "success")
 	};
 
 	const completeAmount = () => {
@@ -197,7 +184,7 @@ export default function ContentSidePanel({ item, onSave, onDelete, onClose }: Re
 					<div className="flex justify-between gap-2 mt-5">
 						<button
 							onClick={() => {
-								if (editable?.id) onDelete(editable.id);
+								if(editable?.id) onDelete(editable.id);
 							}}
 							className="px-3 py-1 gap-x-1 flex justify-center items-center rounded hover:bg-red-100 text-red-700 active:bg-red-200"
 						>

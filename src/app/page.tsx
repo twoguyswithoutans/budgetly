@@ -1,9 +1,7 @@
 "use client";
 import { useState } from "react";
-import Header from "navbar/Header";
-import DashboardContent from "dashboard/DashboardContent";
-import DashboardToolbar from "dashboard/DashboardToolbar";
-import DashboardTitleBar from "dashboard/DashboardTitleBar";
+import Header from "@navbar/Header";
+import DashboardContent from "@dashboard/DashboardContent";
 
 export default function Page() {
 	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());

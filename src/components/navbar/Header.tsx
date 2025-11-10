@@ -1,14 +1,11 @@
 "use client";
-import { supabase } from "@/lib/supabaseClient";
 import { useState, useRef, useEffect } from "react";
-import { ChevronLeft, ChevronRight, Landmark } from "lucide-react";
-import { format, addMonths, subMonths, isAfter, startOfMonth } from "date-fns";
 import { usePathname } from "next/navigation";
-
-interface HeaderProps {
-	triggerRefresh?: number;
-	onMonthChange?: (month: Date) => void;
-}
+import { HeaderProps } from "@models";
+import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@useToast";
+import { format, addMonths, subMonths, isAfter, startOfMonth } from "date-fns";
+import { ChevronLeft, ChevronRight, Landmark } from "lucide-react";
 
 export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<HeaderProps>) {
 	const [open, setOpen] = useState(false);
@@ -18,6 +15,8 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 	const [currentMonth, setCurrentMonth] = useState<Date>(startOfMonth(new Date()));
 	const pathname = usePathname();
 	const showMonthNavigationSection = ["/"].includes(pathname);
+	const formattedMonth = format(currentMonth, "MMMM yyyy");
+	const { showToast } = useToast();
 
 	const titles: Record<string, string> = {
 		"/": "Dashboard",
@@ -51,8 +50,11 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 
 	const fetchNetWorth = async () => {
 		const { data, error } = await supabase.from("net_worth").select("amount").limit(1).single();
-		if (error) console.error("Error fetching net worth:", error);
-		else if (data) setNetWorth(data.amount);
+		if(error) {
+			console.error("Error fetching net worth:", error)
+			showToast("Error fetching net worth", "error")
+		}
+		else if(data) setNetWorth(data.amount);
 	};
 
 	useEffect(() => {
@@ -75,8 +77,9 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 			.limit(1)
 			.single();
 
-		if (error || !data) {
+		if(error || !data) {
 			console.error("Error fetching net worth:", error);
+			showToast("Error fetching net worth!", "error")
 			return;
 		}
 
@@ -86,9 +89,14 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 			.update({ amount: newAmount, updated_at: new Date() })
 			.eq("id", data.id);
 
-		if (updateError) console.error("Error updating net worth:", updateError);
-		else setNetWorth(newAmount);
-
+		if(updateError) {
+			console.error("Error updating net worth:", updateError);
+			showToast("Error updating net worth!", "error")
+		}
+		else {
+			setNetWorth(newAmount)
+			showToast("Net worth updated!", "info")
+		}
 		setOpen(false);
 	}
 
@@ -105,8 +113,6 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 			onMonthChange?.(nextMonth);
 		}
 	};
-
-	const formattedMonth = format(currentMonth, "MMMM yyyy");
 
 	return (
 		<div className="fixed top-0 w-full flex flex-col bg-white dark:bg-[#1c1c1e] border-b border-gray-300 dark:border-gray-700 z-50">

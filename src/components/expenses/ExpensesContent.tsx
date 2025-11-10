@@ -1,19 +1,11 @@
 "use client";
-import React, { useEffect, useMemo, useState } from "react";
-import Loader from "Loader";
+import { useEffect, useMemo, useState } from "react";
+import { Transaction } from "@models";
 import { supabase } from "@/lib/supabaseClient";
+import { EmptyState } from "@emptyStates/EmptyState";
+import Loader from "@Loader";
 import ExpensesChartCard from "./ExpensesChartCard";
 import { format, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
-import { EmptyMiniState } from "emptyStates/EmptyMiniState";
-
-type Transaction = {
-	id: string;
-	title: string;
-	category: string;
-	amount: number;
-	date: string;
-	notes?: string;
-};
 
 function sum(arr: number[]) {
 	return arr.reduce((a, b) => a + b, 0);
@@ -177,7 +169,7 @@ export default function ExpensesContent() {
 
 	const chartData = byCategory.map((c, i) => ({
 		name: c.category,
-		value: c.value,
+		value: c.value
 	}));
 
 	const toggleCategory = (cat: string) => {
@@ -335,7 +327,7 @@ export default function ExpensesContent() {
 					<div className="flex-1 overflow-y-auto space-y-3">
 						{sideItems.length === 0 && (
 							<div className="h-full flex justify-center items-center">
-								<EmptyMiniState message="transactions" />
+								<EmptyState message="transactions" graph={false} />
 							</div>
 						)}
 						{sideItems.map((t) => (

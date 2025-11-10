@@ -1,15 +1,9 @@
 "use client";
 import { useMemo } from "react";
-import { EmptyMiniState } from "emptyStates/EmptyMiniState";
+import { ActiveGoalsProp } from "@models";
+import { EmptyState } from "@emptyStates/EmptyState";
 
-type Goal = {
-	name: string;
-	progress: number;
-	type: string;
-	dateAdded?: string;
-};
-
-const GoalCard = ({ name, progress, type }: Goal) => (
+const GoalCard = ({ name, progress, type }: ActiveGoalsProp) => (
 	<div className="w-full bg-white dark:bg-[#1c1c1e] border border-gray-300 dark:border-gray-700 rounded-lg p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
 		<div className="flex items-center gap-3 w-full sm:w-auto">
 			<div className="font-semibold text-sm">{name}</div>
@@ -34,7 +28,7 @@ const GoalCard = ({ name, progress, type }: Goal) => (
 	</div>
 );
 
-export default function ActiveGoals({ goals }: { goals: Goal[] }) {
+export default function ActiveGoals({ goals }: { goals: ActiveGoalsProp[] }) {
 	const activeGoals = useMemo(() => {
 		return goals
 		.filter((g) => g.progress < 100)
@@ -63,7 +57,7 @@ export default function ActiveGoals({ goals }: { goals: Goal[] }) {
 				))}
 			</div>
 		) : (
-			<EmptyMiniState message="goals" />
+			<EmptyState message="goals" graph={false} />
 		)}
 		</div>
 	);

@@ -1,7 +1,7 @@
 'use client';
 import { useState } from "react";
-import Header from "navbar/Header"
-import GoalsContent from "goals/GoalsContent";
+import Header from "@navbar/Header"
+import GoalsContent from "@goals/GoalsContent";
 
 export default function Page() {
     const [triggerRefresh, setTriggerRefresh] = useState(0);

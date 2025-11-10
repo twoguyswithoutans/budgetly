@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
-import { ThemeProvider } from "components/theme/theme-provider"
-import Navbar from "navbar/Navbar";
+import { ThemeProvider } from "@theme/ThemeProvider";
+import { ToastProvider } from "@toast/ToastProvider";
+import Navbar from "@navbar/Navbar";
 import "./globals.css";
 
 const geistSans = localFont({
@@ -25,14 +26,16 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 		<html lang="en">
 			<body className={`h-[100svh] w-full overflow-hidden bg-background text-foreground ${geistSans.variable} ${geistMono.variable}`}>
 				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-					<div className="flex h-full">
-						<Navbar />
-						<div className="flex-1 flex flex-col">
-							<div className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
-								{children}
+					<ToastProvider>
+						<div className="flex h-full">
+							<Navbar />
+							<div className="flex-1 flex flex-col">
+								<div className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+										{children}
+								</div>
 							</div>
 						</div>
-					</div>
+					</ToastProvider>
 				</ThemeProvider>
 			</body>
 		</html>
