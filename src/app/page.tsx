@@ -4,25 +4,27 @@ import Header from "@navbar/Header";
 import DashboardContent from "@dashboard/DashboardContent";
 
 export default function Page() {
-	const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
+	const [currentMonth, setCurrentMonth] = useState(new Date());
 	const [refreshKey, setRefreshKey] = useState(0);
 
+	const handleMonthChange = (month: Date) => setCurrentMonth(month);
+	const handleRefresh = () => setRefreshKey((prev) => prev + 1);
+
 	return (
-		<div className="flex h-full">
-			<div className="flex-1 flex flex-col">
-				<div className="h-[15svh] md:h-[10svh]">
-					<Header
-						triggerRefresh={refreshKey}
-						onMonthChange={(month: any) => setCurrentMonth(month)}
-					/>
-				</div>
-				<div className="h-[75svh] md:h-[90svh] flex-1">
-					<DashboardContent
-						onTriggerRefresh={() => setRefreshKey((prev) => prev + 1)}
-						currentMonth={currentMonth}
-					/>
-				</div>
-			</div>
-		</div>
-	);
+		<main className="flex flex-col h-full flex-1">
+			<header className="h-[15svh] md:h-[10svh]">
+				<Header
+					triggerRefresh={refreshKey}
+					onMonthChange={handleMonthChange}
+				/>
+			</header>
+
+			<section className="flex-1 overflow-y-auto">
+				<DashboardContent
+					onTriggerRefreshAction={handleRefresh}
+					currentMonth={currentMonth}
+				/>
+			</section>
+		</main>
+	)
 }

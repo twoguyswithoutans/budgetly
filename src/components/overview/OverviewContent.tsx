@@ -162,7 +162,7 @@ export default function Overview() {
 		setShowAI(true);
 
 		try {
-			const res = await fetch("@/app/api/ai-insights", {
+			const res = await fetch("/api/ai-insights", {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify({ summary, spendingData, goals, dateRange }),
@@ -188,7 +188,7 @@ export default function Overview() {
 	}
 
 	return (
-		<div className="p-6 space-y-8 h-[90svh] md:h-screen overflow-auto">
+		<div className="p-6 space-y-8 h-[90svh] lg:h-screen overflow-auto">
 			{/* Header */}
 			<div className="flex justify-between items-center flex-wrap gap-4">
 				<div>
@@ -324,7 +324,7 @@ export default function Overview() {
 			{/* AI Popup */}
 			{showAI && (
 				<div className="fixed -inset-10 bg-black/40 flex items-center justify-center z-50">
-					<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow-lg w-[80vw] md:w-full max-w-md p-6">
+					<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow-lg w-[80vw] lg:w-full max-w-md p-6">
 						<div className="text-lg font-semibold mb-2">AI Insights</div>
 						<div className="text-primary mb-4 text-sm whitespace-pre-wrap">
 							{(() => {

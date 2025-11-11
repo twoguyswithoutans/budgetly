@@ -1,22 +1,15 @@
-import { Category, CategoryTotal } from "@models";
+import type { CategoryTotalsProps } from "@models";
 
-interface CategoryTotalsProps {
-    category: Category;
-    getCategoryTotals: (category: Category) => CategoryTotal;
-    localizeNumber: (value: number) => string;
-}
+export default function CategoryTotals({ category, getCategoryTotals, localizeNumber }: Readonly<CategoryTotalsProps>) {
+	const totals = Object.values(getCategoryTotals(category));
 
-export default function CategoryTotals({ category, getCategoryTotals, localizeNumber }: CategoryTotalsProps) {
-    const { applied, total, due } = getCategoryTotals(category);
-    const totals = [applied, total, due];
-
-    return (
-        <>
-            {totals.map((value, index) => (
-                <div key={index} className="flex-1 text-right font-semibold">
-                    {localizeNumber(value)}
-                </div>
-            ))}
-        </>
-    )
+	return (
+		<>
+			{totals.map((value, i) => (
+				<div key={`${value}-${i}`} className="flex-1 text-right font-semibold">
+					{localizeNumber(value)}
+				</div>
+			))}
+		</>
+	)
 }

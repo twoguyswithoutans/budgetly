@@ -10,6 +10,7 @@ const geistSans = localFont({
 	variable: "--font-geist-sans",
 	weight: "100 900",
 });
+
 const geistMono = localFont({
 	src: "./fonts/GeistMonoVF.woff",
 	variable: "--font-geist-mono",
@@ -24,20 +25,25 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
 	return (
 		<html lang="en">
-			<body className={`h-[100svh] w-full overflow-hidden bg-background text-foreground ${geistSans.variable} ${geistMono.variable}`}>
-				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+			<body
+				className={`h-[100svh] w-full overflow-hidden bg-background text-foreground ${geistSans.variable} ${geistMono.variable}`}
+			>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
 					<ToastProvider>
 						<div className="flex h-full">
 							<Navbar />
-							<div className="flex-1 flex flex-col">
-								<div className="flex-1 overflow-y-auto pb-[env(safe-area-inset-bottom)]">
-										{children}
-								</div>
-							</div>
+							<main className="flex-1 flex flex-col overflow-y-auto pb-[env(safe-area-inset-bottom)]">
+								{children}
+							</main>
 						</div>
 					</ToastProvider>
 				</ThemeProvider>
 			</body>
 		</html>
-	);
+	)
 }

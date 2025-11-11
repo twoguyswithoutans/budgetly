@@ -1,3 +1,5 @@
+import { ChangeEvent } from "react";
+
 // Core Types
 type GoalType = "saving" | "debt";
 type OnTriggerRefresh = () => void;
@@ -57,7 +59,7 @@ export interface HeaderProps {
 	onMonthChange?: (month: Date) => void;
 }
 export interface DashboardContentProp {
-	onTriggerRefresh: OnTriggerRefresh
+	onTriggerRefreshAction: OnTriggerRefresh
 	currentMonth: Date;
 }
 export interface AddItemPopupProps {
@@ -68,9 +70,24 @@ export interface AddItemPopupProps {
 }
 export interface ContentSidePanelProps {
 	item: Item;
-	onSave: OnSave;
-	onDelete: OnDelete;
-	onClose: OnClose;
+	onSaveAction: OnSave;
+	onDeleteAction: OnDelete;
+	onCloseAction: OnClose;
+}
+export interface CategoryTotalsProps {
+	category: Category;
+	getCategoryTotals: (category: Category) => CategoryTotal;
+	localizeNumber: (value: number) => string;
+}
+export interface ItemFormProps {
+	editable: any;
+	addAmount: number | null;
+	currentDate: string;
+	isRepeat: boolean;
+	onChangeAction: (e: ChangeEvent<HTMLInputElement>) => void;
+	onAddAmountAction: (e: ChangeEvent<HTMLInputElement>) => void;
+	onToggleRepeatAction: () => void;
+	onCompleteAmountAction: () => void;
 }
 export interface ExpensesChartCardProps {
 	totalSpending: number;

@@ -1,20 +1,20 @@
-'use client';
+"use client";
 import { useState } from "react";
-import Header from "@navbar/Header"
+import Header from "@navbar/Header";
 import GoalsContent from "@goals/GoalsContent";
 
 export default function Page() {
     const [triggerRefresh, setTriggerRefresh] = useState(0);
+    const handleRefresh = () => setTriggerRefresh((prev) => prev + 1);
+
     return (
-        <div className="flex h-full">
-            <div className="flex-1 flex flex-col">
-                <div className="h-[10vh]">
-                    <Header triggerRefresh={triggerRefresh} />
-                </div>
-                <div className="h-fit flex-1">
-                    <GoalsContent onTriggerRefresh={() => setTriggerRefresh(prev => prev + 1)} />
-                </div>
-            </div>
-        </div>
+        <main className="flex flex-col h-full flex-1">
+			<header className="h-[10vh]">
+				<Header triggerRefresh={triggerRefresh} />
+			</header>
+			<section className="flex-1 overflow-y-auto">
+				<GoalsContent onTriggerRefresh={handleRefresh} />
+			</section>
+		</main>
     )
 }

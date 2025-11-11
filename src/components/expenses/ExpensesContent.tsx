@@ -69,13 +69,15 @@ export default function ExpensesContent() {
 
 	const allCategories = useMemo(() => {
 		const set = new Set<string>();
-		transactions.forEach((t) => set.add(t.category));
-		return Array.from(set).sort();
+		for(const transaction of transactions) {
+			set.add(transaction.category);
+		}
+		return Array.from(set).sort((a, b) => a.localeCompare(b));
 	}, [transactions]);
 
 	const dateRange = useMemo(() => {
 		let from: Date;
-		let to: Date = new Date(today);
+		let to: Date;
 
 		if (rangePreset === "this_month") {
 			from = startOfMonth(today);
@@ -111,9 +113,9 @@ export default function ExpensesContent() {
 
 	const byCategory = useMemo(() => {
 		const map = new Map<string, number>();
-		filtered.forEach((t) => {
-			map.set(t.category, (map.get(t.category) || 0) + t.amount);
-		});
+		for(const transaction of filtered) {
+			map.set(transaction.category, (map.get(transaction.category) || 0) + transaction.amount);
+		}
 		const arr = Array.from(map.entries()).map(([category, value]) => ({
 			category,
 			value: Math.round(value * 100) / 100,
@@ -163,7 +165,7 @@ export default function ExpensesContent() {
 
 	const sideItems = useMemo(() => {
 		return [...filtered]
-			.filter((t) => t.amount > 0) // 🔥 hides zero-applied transactions
+			.filter((t) => t.amount > 0)
 			.sort((a, b) => b.amount - a.amount);
 	}, [filtered]);
 
@@ -193,9 +195,9 @@ export default function ExpensesContent() {
 		)
 	}
 	return (
-		<div className="w-full h-[90svh] flex flex-col md:flex-row">
+		<div className="w-full h-[90svh] flex flex-col lg:flex-row">
 			<div className="w-full flex flex-col">
-				<div className="bg-white dark:bg-[#1c1c1e] flex flex-col md:flex-row md:items-center md:justify-between gap-4 p-4 border-b border-gray-300 dark:border-gray-700">
+				<div className="bg-white dark:bg-[#1c1c1e] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 border-b border-gray-300 dark:border-gray-700">
 					<div className="flex items-center gap-3 flex-wrap">
 						<div className="text-sm font-semibold">Show Categories:</div>
 						<div className="flex gap-2 flex-wrap">
@@ -256,7 +258,7 @@ export default function ExpensesContent() {
 					</div>
 				</div>
 				{/* MAIN CONTENT */}
-				<div className="md:p-6 h-full flex flex-col gap-y-10 overflow-auto">
+				<div className="lg:p-6 h-full flex flex-col gap-y-10 overflow-auto">
 					<ExpensesChartCard
 						totalSpending={totalSpending}
 						filteredCount={filtered.length}
@@ -265,7 +267,7 @@ export default function ExpensesContent() {
 						chartData={chartData}
 					/>
 					{/* Stats */}
-					<div className="mb-8 md:mb-0 p-4 md:p-0 grid grid-cols-1 md:grid-cols-4 gap-4">
+					<div className="mb-8 lg:mb-0 p-4 md:p-6 lg:p-0 grid grid-cols-1 lg:grid-cols-4 gap-4">
 						<div className="bg-white dark:bg-[#1c1c1e] rounded-lg shadow p-4 border border-gray-300 dark:border-gray-700">
 							<div className="text-sm text-muted-foreground">
 								Average Monthly
@@ -314,8 +316,8 @@ export default function ExpensesContent() {
 					</div>
 				</div>
 			</div>
-			{/* Right Side Panel */}
-			<div className="w-full md:w-[35vw] h-fit md:h-[90svh] md:border-l border-gray-300 dark:border-gray-700 pb-[10svh] md:pb-0">
+			{/* Transactions Panel */}
+			<div className="w-full lg:w-[35vw] h-fit lg:h-[90svh] lg:border-l border-gray-300 dark:border-gray-700 pb-[10svh] lg:pb-0">
 				<div className="bg-white dark:bg-[#1c1c1e] p-4 h-full flex flex-col">
 					<div className="text-lg font-bold mb-3">Transactions</div>
 					<div className="text-sm text-gray-500">

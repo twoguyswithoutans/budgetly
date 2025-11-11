@@ -159,7 +159,6 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			<Loader title="Goals" />
 		)
 	}
-
 	if(goals.length === 0) {
 		return (
 			<div className="flex flex-col items-center justify-center w-full h-full text-gray-500 dark:text-gray-400">
@@ -172,7 +171,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 		)
 	}
 	return (
-		<div className="flex flex-col w-full h-[90svh] bg-background dark:bg-[#1c1c1e] text-foreground p-6 gap-6 overflow-auto pb-[10svh] md:pb-0">
+		<div className="flex flex-col w-full h-[90svh] bg-background dark:bg-[#1c1c1e] text-foreground p-6 gap-6 overflow-auto pb-[10svh] lg:pb-0">
 			<div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 				{/* Summary */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow p-6 flex flex-col justify-start gap-y-3">
@@ -224,8 +223,8 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 							<YAxis tick={{ fontSize: 12 }} />
 							<Tooltip />
 							<Bar dataKey="value" radius={[4, 4, 0, 0]}>
-								{chartData.map((_, index) => (
-									<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+								{chartData.map((entry, index) => (
+									<Cell key={entry.name + index} fill={COLORS[index % COLORS.length]} />
 								))}
 							</Bar>
 						</BarChart>
