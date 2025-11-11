@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import PwaRegister from "./pwa-register";
 import localFont from "next/font/local";
 import { ThemeProvider } from "@theme/ThemeProvider";
 import { ToastProvider } from "@toast/ToastProvider";
@@ -20,6 +21,7 @@ const geistMono = localFont({
 export const metadata: Metadata = {
 	title: "Budget App",
 	description: "A simple budget app",
+	manifest: "/manifest.json",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
@@ -28,6 +30,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
 			<body
 				className={`h-[100svh] w-full overflow-hidden bg-background text-foreground ${geistSans.variable} ${geistMono.variable}`}
 			>
+				<PwaRegister />
 				<ThemeProvider
 					attribute="class"
 					defaultTheme="system"

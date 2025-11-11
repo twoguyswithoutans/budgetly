@@ -6,7 +6,7 @@ const AddItemPopup = forwardRef<HTMLDivElement, AddItemPopupProps>(
 	({ newItemName, setNewItemName, onCancel, onAdd }, ref) => (
 		<div
 			ref={ref}
-			className="absolute top-full left-10 w-[60vw] md:w-[40vw] lg:w-[20vw] p-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1c1c1e] shadow-lg z-50 over"
+			className="absolute top-0 left-8  w-[60vw] md:w-[40vw] lg:w-[20vw] p-4 rounded-xl border border-gray-300 dark:border-gray-700 bg-white dark:bg-[#1c1c1e] shadow-lg z-50 over"
 		>
 			<div className="mb-2 font-semibold text-gray-800 dark:text-gray-200">
 				Add Item
