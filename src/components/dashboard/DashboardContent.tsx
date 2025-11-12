@@ -4,7 +4,7 @@ import { format } from "date-fns";
 import { ChevronDown, ChevronRight, CirclePlus } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@useToast";
-import Loader from "@Loader";
+import Loader from "@loader/Loader";
 import DashboardTitleBar from "@dashboard/DashboardTitleBar";
 import ContentSidePanel from "./ContentSidePanel";
 import AddItemPopup from "./AddItemPopup";
@@ -85,7 +85,7 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 		onTriggerRefreshAction();
 		setPopupCategory(null);
 		setNewItemName("");
-		showToast("Item added successfully", "info");
+		showToast("Item added successfully!", "success");
 	}
 
 	const handleItemSave = async (updatedItem: Item) => {
@@ -100,7 +100,6 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 		);
 		setSelectedItem(undefined);
 		onTriggerRefreshAction();
-		showToast("Item saved", "success");
 	}
 
 	const handleItemDelete = async (id: string) => {
@@ -112,7 +111,7 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 		);
 		setSelectedItem(undefined);
 		onTriggerRefreshAction();
-		showToast("Item deleted", "success");
+		showToast("Item deleted successfully!", "success");
 	}
 
 	const handleSelectItem = useCallback((item: Item) => setSelectedItem(item), []);
@@ -132,12 +131,13 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 			{ applied: 0, total: 0, due: 0 }
 		)
 
-	if (loading)
+	if(loading) {
 		return (
 			<div className="flex justify-center items-center h-[65svh] md:h-[70svh] lg:h-[80svh]">
 				<Loader title="Dashboard" />
 			</div>
 		)
+	}
 	return (
 		<div className="flex flex-col lg:flex-row w-full">
 			<div className="w-screen lg:w-[55vw] flex flex-col bg-white dark:bg-[#1c1c1e] border-r border-gray-300 dark:border-gray-700">
@@ -164,6 +164,7 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 															: [...prev, category.name]
 													)
 												}
+												aria-label="Chevron"
 											>
 												{isOpen ? (
 													<ChevronDown size={15} className="text-muted-foreground" />
@@ -177,6 +178,7 @@ export default function DashboardContent({ onTriggerRefreshAction, currentMonth 
 													setPopupCategory(isPopupOpen ? null : category.name);
 													setNewItemName("");
 												}}
+												aria-label="Add Item"
 											>
 												<CirclePlus size={18} className="text-blue-600" />
 											</button>

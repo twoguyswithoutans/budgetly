@@ -1,4 +1,3 @@
-"use client";
 import { forwardRef } from "react";
 import type { AddItemPopupProps } from "@models";
 
@@ -22,6 +21,7 @@ const AddItemPopup = forwardRef<HTMLDivElement, AddItemPopupProps>(
 				<button
 					type="button"
 					onClick={onCancel}
+					aria-label="Cancel"
 					className="px-3 py-1.5 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
 				>
 					Cancel
@@ -29,6 +29,7 @@ const AddItemPopup = forwardRef<HTMLDivElement, AddItemPopupProps>(
 				<button
 					type="button"
 					onClick={onAdd}
+					aria-label="Add"
 					className="px-3 py-1.5 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
 				>
 					Add

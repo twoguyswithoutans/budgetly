@@ -14,11 +14,10 @@ export default function Page() {
 		<main className="flex flex-col h-full flex-1">
 			<header className="h-[15svh] md:h-[10svh]">
 				<Header
-					triggerRefresh={refreshKey}
+					triggerRefreshAction={refreshKey}
 					onMonthChange={handleMonthChange}
 				/>
 			</header>
-
 			<section className="flex-1 overflow-y-auto">
 				<DashboardContent
 					onTriggerRefreshAction={handleRefresh}

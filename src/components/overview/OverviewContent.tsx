@@ -1,10 +1,9 @@
 "use client";
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabaseClient";
-import { EmptyState } from "@emptyStates/EmptyState";
-import Loader from "@Loader";
+import Loader from "@loader/Loader";
 import ActiveGoals from "./ActiveGoalsCard";
-import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, ResponsiveContainer, Tooltip, Legend } from "recharts";
+import { ChartLazyLoader } from "@loader/ChartLazyLoader"
 import { startOfMonth, endOfMonth, subMonths, format, parseISO, isAfter, isBefore } from "date-fns";
 
 export default function Overview() {
@@ -22,7 +21,6 @@ export default function Overview() {
 	const [aiLoading, setAiLoading] = useState(false);
 	const [aiText, setAiText] = useState<string>("");
 	const [aiError, setAiError] = useState<string | null>(null);
-	const COLORS = ["#10b981", "#3b82f6", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 	useEffect(() => {
 		const today = new Date();
@@ -200,6 +198,7 @@ export default function Overview() {
 						className="border rounded-lg px-3 py-1 text-sm"
 						value={filter}
 						onChange={(e) => setFilter(e.target.value)}
+						aria-label="Date Selector"
 					>
 						<option>This Month</option>
 						<option>Last Month</option>
@@ -236,7 +235,7 @@ export default function Overview() {
 						key={i}
 						className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-5"
 					>
-						<h3 className="text-foreground text-sm">{item.title}</h3>
+						<div className="text-foreground text-sm">{item.title}</div>
 						<p className={`text-2xl font-semibold ${item.color}`}>
 							$
 							{item.value.toLocaleString("en-US", {
@@ -252,58 +251,12 @@ export default function Overview() {
 				{/* Spending Breakdown */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-6">
 					<div className="font-semibold mb-3">Spending Breakdown</div>
-					<div className="h-[320px] w-full flex justify-center items-center overflow-auto text-black">
-						{spendingData.length > 0 ? (
-						<ResponsiveContainer width="100%" height="100%">
-							<BarChart
-								data={spendingData}
-								margin={{ top: 30, right: 30, left: 0, bottom: 0 }}
-							>
-								<CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-								<XAxis
-									dataKey="name"
-									angle={-15}
-									textAnchor="end"
-									interval={0}
-									height={60}
-									tick={{ fontSize: 14 }}
-								/>
-								<YAxis tick={{ fontSize: 12 }} />
-								<Tooltip />
-								<Bar dataKey="value" radius={[4, 4, 0, 0]}>
-									{spendingData.map((_, index) => (
-										<Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-									))}
-								</Bar>
-							</BarChart>
-						</ResponsiveContainer>
-						) : (
-							<EmptyState message="spending" graph={true} />
-						)}
-					</div>
+					<ChartLazyLoader chartData={spendingData} />
 				</div>
 				{/* Income vs Expenses */}
 				<div className="bg-white dark:bg-[#2a2a2d] rounded-2xl shadow p-4">
 					<div className="font-semibold mb-3">Income vs Expenses</div>
-					<div className="h-[320px] w-full flex justify-center items-center overflow-auto text-black">
-						{spendingData.length > 0 ? (
-							<ResponsiveContainer width="100%" height={250}>
-								<BarChart
-									data={trendData}
-									margin={{ top: 20, right: 30, bottom: 0, left: 0 }}
-								>
-									<XAxis dataKey="month" />
-									<YAxis />
-									<Tooltip />
-									<Legend />
-									<Bar dataKey="income" fill="#10b981" radius={[4, 4, 0, 0]} />
-									<Bar dataKey="expenses" fill="#ef4444" radius={[4, 4, 0, 0]} />
-								</BarChart>
-							</ResponsiveContainer>
-						) : (
-							<EmptyState message="income or expense" graph={true} />
-						)}
-					</div>
+					<ChartLazyLoader comparison chartData={spendingData} otherData={trendData}/>
 				</div>
 			</div>
 			{/* Goal Progress */}
@@ -316,6 +269,7 @@ export default function Overview() {
 				</p>
 				<button
 					onClick={askAI}
+					aria-label="AI Insights"
 					className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-xl text-sm font-medium"
 				>
 					Ask AI for insights
@@ -335,6 +289,7 @@ export default function Overview() {
 						</div>
 						<button
 							onClick={() => setShowAI(false)}
+							aria-label="Close"
 							className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl text-sm font-medium"
 						>
 							Close

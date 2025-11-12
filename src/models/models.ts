@@ -55,7 +55,7 @@ export interface NavItem {
 	icon: React.ComponentType<{ size?: string | number }>;
 }
 export interface HeaderProps {
-	triggerRefresh?: number;
+	triggerRefreshAction?: number;
 	onMonthChange?: (month: Date) => void;
 }
 export interface DashboardContentProp {
@@ -103,7 +103,7 @@ export interface ActiveGoalsProp {
 	dateAdded?: string;
 }
 export interface GoalsContentProp {
-	onTriggerRefresh: OnTriggerRefresh;
+	onTriggerRefreshAction: OnTriggerRefresh;
 }
 export interface CategoryItemsProps {
 	items: Item[];
@@ -115,4 +115,9 @@ export interface ChartItem {
 	name: string;
 	value: number;
 	color?: string;
+}
+export interface ChartDataProps {
+	chartData: ChartItem[];
+	otherData?: any[];
+	comparison?: boolean;
 }

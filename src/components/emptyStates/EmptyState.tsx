@@ -17,7 +17,7 @@ export const EmptyState = ({ simple, message, graph }: EmptyStateProps) => {
                 <div className={`${base} flex-col justify-center`}>
                     <Icon size={25} />
                     <div className="text-center py-4">
-                        <div>No active {message} right now</div>
+                        <div>No active {message}.</div>
                         <div>Add a new {message} to start tracking progress.</div>
                     </div>
                 </div>

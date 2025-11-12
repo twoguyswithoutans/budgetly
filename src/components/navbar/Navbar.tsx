@@ -31,6 +31,7 @@ export default function Navbar() {
 			<button
 				key={item.name}
 				onClick={() => router.push(item.path)}
+				aria-label={item.name}
 				className={`${baseClass} ${activeClass}`}
 			>
 				<div className="flex items-center justify-center w-6 h-6">

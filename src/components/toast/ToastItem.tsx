@@ -1,4 +1,3 @@
-"use client";
 import type { Toast } from "./ToastProvider";
 import { Check, ShieldAlert, Info } from "lucide-react";
 

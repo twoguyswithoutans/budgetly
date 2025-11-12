@@ -1,4 +1,3 @@
-'use client';
 import { useTheme } from "next-themes";
 
 export default function ThemeToggle() {
@@ -7,6 +6,7 @@ export default function ThemeToggle() {
     return (
         <div className="flex flex-col justify-center items-center p-2 m-0 z-40">
             <button
+                aria-label="Theme Toggle"
                 onClick={() => { setTheme(resolvedTheme === "dark" ? "light" : resolvedTheme === "light" ? "dark" : "light") }}
             >
                 <div>

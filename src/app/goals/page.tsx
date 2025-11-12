@@ -10,10 +10,10 @@ export default function Page() {
     return (
         <main className="flex flex-col h-full flex-1">
 			<header className="h-[10vh]">
-				<Header triggerRefresh={triggerRefresh} />
+				<Header triggerRefreshAction={triggerRefresh} />
 			</header>
 			<section className="flex-1 overflow-y-auto">
-				<GoalsContent onTriggerRefresh={handleRefresh} />
+				<GoalsContent onTriggerRefreshAction={handleRefresh} />
 			</section>
 		</main>
     )

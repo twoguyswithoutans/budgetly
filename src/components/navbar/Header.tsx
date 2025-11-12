@@ -7,7 +7,7 @@ import { useToast } from "@useToast";
 import { format, addMonths, subMonths, isAfter, startOfMonth } from "date-fns";
 import { ChevronLeft, ChevronRight, Landmark } from "lucide-react";
 
-export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<HeaderProps>) {
+export default function Header({ triggerRefreshAction = 0, onMonthChange }: Readonly<HeaderProps>) {
 	const [open, setOpen] = useState(false);
 	const popupRef = useRef<HTMLDivElement | null>(null);
 	const [netWorth, setNetWorth] = useState<number>(0);
@@ -62,8 +62,8 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 	}, []);
 
 	useEffect(() => {
-		if (triggerRefresh > 0) fetchNetWorth();
-	}, [triggerRefresh]);
+		if (triggerRefreshAction > 0) fetchNetWorth();
+	}, [triggerRefreshAction]);
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		const currentAmount = Number.parseFloat(e.target.value);
@@ -116,17 +116,17 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 
 	return (
 		<div className="fixed top-0 w-full flex flex-col bg-white dark:bg-[#1c1c1e] border-b border-gray-300 dark:border-gray-700 z-50">
-
 			<div className="w-screen lg:w-[80vw] h-[10svh] border-b border-gray-300 dark:border-gray-700 flex justify-between items-center px-6">
 				<div>
 					<div className="text-base md:text-lg font-bold text-gray-800 dark:text-gray-200">{title}</div>
 				</div>
 				<div className="hidden md:flex">
-					{/* Month navigation */}
+					{/* Month navigation desktop view */}
 					{showMonthNavigationSection && (
 						<div className="flex items-center gap-2">
 							<button
 								onClick={handlePreviousMonth}
+								aria-label="Chevron Left"
 								className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition"
 							>
 								<ChevronLeft size={25} />
@@ -137,6 +137,7 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 							<button
 								onClick={handleNextMonth}
 								disabled={isAfter(addMonths(currentMonth, 1), startOfMonth(new Date()))}
+								aria-label="Chevron Right"
 								className={`p-2 rounded transition ${
 									isAfter(addMonths(currentMonth, 1), startOfMonth(new Date()))
 										? "opacity-50 cursor-not-allowed"
@@ -154,13 +155,14 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 					<div className="h-full flex items-center">
 						<button
 							onClick={() => setOpen(!open)}
+							aria-label="Net Worth"
 							className="px-4 py-3 rounded flex justify-center items-center gap-x-2 text-sm text-white bg-[#294a6f]"
 						>
-							<div className="hidden md:grid">
+							<div className="grid">
 								<Landmark size={25} />
 							</div>
 							<div className="flex md:flex-col gap-x-2 text-background">
-								<div className="text-white">Net Worth:</div>
+								<div className="text-white">Net Worth</div>
 								<span className="text-white font-bold">${localizeNumber(netWorth ?? 0)}</span>
 							</div>
 						</button>
@@ -185,12 +187,14 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 							<div className="flex justify-end gap-2">
 								<button
 									onClick={() => setOpen(false)}
+									aria-label="Cancel"
 									className="px-3 py-1.5 text-sm rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-800 dark:text-gray-100"
 								>
 									Cancel
 								</button>
 								<button
 									onClick={() => updateNetWorth()}
+									aria-label="Assign"
 									className="px-3 py-1.5 text-sm rounded bg-blue-600 hover:bg-blue-700 text-white"
 								>
 									Assign
@@ -206,6 +210,7 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 						<div className="flex items-center gap-2">
 							<button
 								onClick={handlePreviousMonth}
+								aria-label="Chevron Left"
 								className="p-2 rounded"
 							>
 								<ChevronLeft size={20} />
@@ -216,6 +221,7 @@ export default function Header({ triggerRefresh = 0, onMonthChange }: Readonly<H
 							<button
 								onClick={handleNextMonth}
 								disabled={isAfter(addMonths(currentMonth, 1), startOfMonth(new Date()))}
+								aria-label="Chevron Right"
 								className={`p-2 rounded transition ${
 									isAfter(addMonths(currentMonth, 1), startOfMonth(new Date()))
 										? "opacity-50 cursor-not-allowed"

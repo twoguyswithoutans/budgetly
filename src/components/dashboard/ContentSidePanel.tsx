@@ -49,7 +49,7 @@ export default function ContentSidePanel({ item, onSaveAction, onDeleteAction, o
 		<div className="absolute top-0 bg-background w-screen lg:w-full h-full shadow-md flex flex-col gap-6 p-5 z-50 overflow-auto">
 			<header className="flex justify-between items-center">
 				<div className="text-xl font-bold">{item?.title}</div>
-				<button onClick={onCloseAction} className="text-xl font-bold">
+				<button onClick={onCloseAction} aria-label="Close" className="text-xl font-bold">
 					<X size={20} />
 				</button>
 			</header>
@@ -70,12 +70,14 @@ export default function ContentSidePanel({ item, onSaveAction, onDeleteAction, o
 				<footer className="flex justify-between gap-2 mt-5">
 					<button
 						onClick={() => editable?.id && onDeleteAction(editable.id)}
+						aria-label="Delete"
 						className="px-3 py-1 gap-x-1 flex items-center rounded hover:bg-red-100 text-red-700 active:bg-red-200"
 					>
 						<Trash size={15} /> Delete
 					</button>
 					<button
 						onClick={handleSave}
+						aria-label="Save"
 						className="px-3 py-1 gap-x-1 flex items-center rounded bg-blue-800 hover:bg-blue-900 active:bg-blue-950 text-white"
 					>
 						Save <Save size={15} />

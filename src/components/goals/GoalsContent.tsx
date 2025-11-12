@@ -1,13 +1,14 @@
+"use client"
 import { useState, useEffect, useMemo } from "react";
 import { Goal, GoalsContentProp } from "@models";
 import { supabase } from "@/lib/supabaseClient";
 import { EmptyState } from "@emptyStates/EmptyState";
 import { useToast } from "@useToast";
-import Loader from "@Loader";
-import { CartesianGrid, XAxis, YAxis, BarChart, Bar, Cell, Tooltip, ResponsiveContainer } from "recharts";
+import Loader from "@loader/Loader";
+import { ChartLazyLoader } from "@loader/ChartLazyLoader"
 import { Scroll, Edit, Trash2, CheckCircle, AlertTriangle, Wallet, CreditCard, Target } from "lucide-react";
 
-export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContentProp>) {
+export default function GoalsContent({ onTriggerRefreshAction }: Readonly<GoalsContentProp>) {
 	const [loading, setLoading] = useState(true);
 	const [goals, setGoals] = useState<Goal[]>([]);
 	const [editingGoal, setEditingGoal] = useState<Goal | null>(null);
@@ -15,7 +16,6 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 	const completedGoals = goals.filter((g) => g.current >= g.target);
 	const activeGoals = goals.filter((g) => g.current < g.target);
 	const today = new Date();
-	const COLORS = ["#22c55e", "#ef4444"];
 	const { showToast } = useToast();
 
 	useEffect(() => {
@@ -75,7 +75,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 		if(newCurrent >= goal.target) {
 			showToast("Goal completed!", "info")
 		}
-		onTriggerRefresh();
+		onTriggerRefreshAction();
 	};
 
 	const handleDelete = async (id: string) => {
@@ -86,7 +86,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 			return;
 		}
 		setGoals((prev) => prev.filter((g) => g.id !== id));
-		onTriggerRefresh();
+		onTriggerRefreshAction();
 		showToast("Goal deleted!", "success")
 	};
 
@@ -118,7 +118,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 		}
 		setAddAmount("");
 		setEditingGoal(null);
-		onTriggerRefresh();
+		onTriggerRefreshAction();
 	};
 
 	const totalSavings = useMemo(
@@ -205,30 +205,8 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 					</div>
 				</div>
 				{/* Chart */}
-				<div className="h-[320px] w-full bg-white dark:bg-[#2a2a2d] rounded-xl shadow flex justify-center items-center text-black">
-					<ResponsiveContainer width="100%" height="100%">
-						<BarChart
-							data={chartData}
-							margin={{ top: 30, right: 30, left: 0, bottom: 0 }}
-						>
-							<CartesianGrid strokeDasharray="3 3" stroke="#ccc" />
-							<XAxis
-								dataKey="name"
-								angle={-15}
-								textAnchor="end"
-								interval={0}
-								height={60}
-								tick={{ fontSize: 14 }}
-							/>
-							<YAxis tick={{ fontSize: 12 }} />
-							<Tooltip />
-							<Bar dataKey="value" radius={[4, 4, 0, 0]}>
-								{chartData.map((entry, index) => (
-									<Cell key={entry.name + index} fill={COLORS[index % COLORS.length]} />
-								))}
-							</Bar>
-						</BarChart>
-					</ResponsiveContainer>
+				<div className="bg-white dark:bg-[#2a2a2d] rounded-xl shadow">
+					<ChartLazyLoader chartData={chartData} />
 				</div>
 			</div>
 			{/* Active Goals */}
@@ -240,7 +218,6 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 							const progress = goal.target > 0 ? (goal.current / goal.target) * 100 : 0;
 							const due = goal.due ? new Date(goal.due) : null;
 							const overdue = !!due && due < today && goal.type === "debt";
-							const nearComplete = progress >= 80 && progress < 100;
 
 							return (
 								<div key={goal.id} className="border-b border-gray-300 dark:border-gray-700 pb-3">
@@ -248,7 +225,7 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 										<div className="flex items-center gap-2">
 											<span
 												className={`text-sm font-semibold ${
-													goal.type === "saving" ? "text-[#1c9247]" : "text-[#d33d3d]"
+													goal.type === "saving" ? "text-[#36ac61]" : "text-[#d65050]"
 												}`}
 											>
 												{goal.name}
@@ -271,30 +248,32 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 											style={{ width: `${Math.min(100, Math.max(0, progress))}%` }}
 										/>
 									</div>
-									<div className="flex justify-between mt-2 text-xs text-gray-500 dark:text-gray-400">
+									<div className="flex justify-between mt-2 text-gray-500 dark:text-gray-400">
 										<span>Due: {goal.due || "—"}</span>
-										<div className="flex gap-2">
+										<div className="flex gap-4">
 											<button
 												onClick={() => handleAddProgress(goal.id, 100)}
-												className="text-blue-500 hover:underline"
+												aria-label="Add 100 Dollars"
+												className="text-blue-600 dark:text-blue-400 hover:underline"
 											>
 												+ Add $100
 											</button>
 											<button
 												onClick={() => setEditingGoal(goal)}
+												aria-label="Edit"
 												className="text-gray-500 hover:text-gray-700"
 											>
-												<Edit size={14} />
+												<Edit size={20} />
 											</button>
 											{editingGoal?.id === goal.id && (
 												<div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50">
 													<div className="bg-white dark:bg-[rgb(28,28,30)] p-6 rounded-xl w-80 shadow-lg">
 														<h3 className="text-lg font-bold mb-4">Add Amount</h3>
 
-														<div className="flex flex-col gap-3">
-															<p className="text-sm font-medium">
+														<div className="flex flex-col gap-4">
+															<div className="text-sm font-medium">
 																{editingGoal.name} ({editingGoal.type === "saving" ? "Saving" : "Debt"})
-															</p>
+															</div>
 															<label htmlFor="addAmount" className="text-sm font-semibold">Amount to Add</label>
 															<input
 																name="addAmount"
@@ -310,12 +289,14 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 																		setAddAmount("");
 																		setEditingGoal(null);
 																	}}
+																	aria-label="Cancel"
 																	className="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600"
 																>
 																	Cancel
 																</button>
 																<button
 																	onClick={handleAddAmount}
+																	aria-label="Add"
 																	className="px-4 py-2 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-semibold"
 																>
 																	Add
@@ -327,17 +308,13 @@ export default function GoalsContent({ onTriggerRefresh }: Readonly<GoalsContent
 											)}
 											<button
 												onClick={() => handleDelete(goal.id)}
+												aria-label="Delete"
 												className="text-[#ef4444] hover:text-[#c93a3a]"
 											>
-												<Trash2 size={14} />
+												<Trash2 size={20} />
 											</button>
 										</div>
 									</div>
-									{nearComplete && (
-										<div className="mt-2 text-xs text-green-600 flex items-center gap-1">
-											<CheckCircle size={12} /> You're almost there!
-										</div>
-									)}
 								</div>
 							);
 						})}

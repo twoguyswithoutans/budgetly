@@ -26,10 +26,11 @@
       "@expenses/*": ["./src/components/expenses/*"],
       "@goals/*": ["./src/components/goals/*"],
       "@overview/*": ["./src/components/overview/*"],
+      "@charts/*": ["./src/components/charts/*"],
       "@emptyStates/*": ["./src/components/emptyStates/*"],
       "@toast/*": ["./src/components/toast/*"],
+      "@loader/*": ["./src/components/loader/*"],
       "@useToast": ["./src/components/toast/useToast"],
-      "@Loader": ["./src/components/loader/Loader"],
       "@models": ["./src/models/models"],
     }
   },

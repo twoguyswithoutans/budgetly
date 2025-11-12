@@ -1,4 +1,3 @@
-"use client";
 import { memo } from "react";
 import type { Item, CategoryItemsProps } from "@models";
 import { EmptyState } from "@emptyStates/EmptyState";
@@ -23,6 +22,7 @@ function CategoryItems({ items, handleSelectedItem, localizeNumber }: Readonly<C
 					<button
 						key={id}
 						onClick={handleClick(item)}
+						aria-label="Category Item"
 						className={`${baseRow} ${baseBg}`}
 					>
 						<div className="flex flex-[2] items-center truncate">{title}</div>

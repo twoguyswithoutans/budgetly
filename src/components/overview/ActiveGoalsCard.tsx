@@ -1,5 +1,5 @@
-"use client";
 import { useMemo } from "react";
+import { useRouter } from "next/navigation";
 import { ActiveGoalsProp } from "@models";
 import { EmptyState } from "@emptyStates/EmptyState";
 
@@ -29,6 +29,7 @@ const GoalCard = ({ name, progress, type }: ActiveGoalsProp) => (
 );
 
 export default function ActiveGoals({ goals }: { goals: ActiveGoalsProp[] }) {
+	const router = useRouter();
 	const activeGoals = useMemo(() => {
 		return goals
 		.filter((g) => g.progress < 100)
@@ -46,7 +47,13 @@ export default function ActiveGoals({ goals }: { goals: ActiveGoalsProp[] }) {
 		<div className="flex justify-between items-center mb-4">
 			<div className="text-lg font-bold">Active Goals</div>
 			{activeGoals.length > 3 && (
-				<button className="text-sm text-blue-600 hover:underline">View All</button>
+				<button
+					onClick={() => router.push("/goals")}
+					aria-label="View All"
+					className="text-sm text-blue-600 hover:underline"
+				>
+					View All
+				</button>
 			)}
 		</div>
 

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Transaction } from "@models";
 import { supabase } from "@/lib/supabaseClient";
 import { EmptyState } from "@emptyStates/EmptyState";
-import Loader from "@Loader";
+import Loader from "@loader/Loader";
 import ExpensesChartCard from "./ExpensesChartCard";
 import { format, parseISO, isAfter, isBefore, startOfMonth, endOfMonth } from "date-fns";
 
@@ -195,31 +195,33 @@ export default function ExpensesContent() {
 		)
 	}
 	return (
-		<div className="w-full h-[90svh] flex flex-col lg:flex-row">
+		<div className="w-full h-full flex flex-col lg:flex-row">
 			<div className="w-full flex flex-col">
 				<div className="bg-white dark:bg-[#1c1c1e] flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4 p-4 border-b border-gray-300 dark:border-gray-700">
 					<div className="flex items-center gap-3 flex-wrap">
 						<div className="text-sm font-semibold">Show Categories:</div>
 						<div className="flex gap-2 flex-wrap">
-							{allCategories.map((cat) => {
+							{allCategories.map((category) => {
 								const active =
-									!selectedCategories || selectedCategories.includes(cat);
+									!selectedCategories || selectedCategories.includes(category);
 								return (
 									<button
-										key={cat}
-										onClick={() => toggleCategory(cat)}
+										key={category}
+										onClick={() => toggleCategory(category)}
+										aria-label="Category"
 										className={`px-3 py-1 rounded-full text-sm border ${
 											active
 												? "bg-blue-600 text-white border-blue-600"
 												: "bg-white dark:bg-[#1c1c1e] text-gray-700 border-gray-300 dark:border-gray-700"
 										}`}
 									>
-										{cat}
+										{category}
 									</button>
 								);
 							})}
 							<button
 								onClick={resetCategories}
+								aria-label="Reset"
 								className="px-3 py-1 rounded-full text-sm border bg-gray-100 dark:bg-gray-700"
 							>
 								Reset
@@ -231,6 +233,7 @@ export default function ExpensesContent() {
 							value={rangePreset}
 							onChange={(e) => setRangePreset(e.target.value as any)}
 							className="px-3 py-1 border rounded bg-white dark:bg-[#1c1c1e]"
+							aria-label="Date Selector"
 						>
 							<option value="this_month">This month</option>
 							<option value="last_3_months">Last 3 months</option>
